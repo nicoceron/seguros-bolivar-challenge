@@ -1,0 +1,10 @@
+.git
+.github
+.idea
+.vscode
+docs
+output
+target
+tmp
+*.log
+

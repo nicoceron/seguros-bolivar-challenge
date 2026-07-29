@@ -2,8 +2,12 @@ package com.segurosbolivar.policy.integration.core;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+
+import java.net.http.HttpClient;
+import java.time.Duration;
 
 @Component
 public class HttpCoreEventPublisher implements CoreEventPublisher {
@@ -13,11 +17,19 @@ public class HttpCoreEventPublisher implements CoreEventPublisher {
     public HttpCoreEventPublisher(
             RestClient.Builder restClientBuilder,
             @Value("${app.core.base-url}") String coreBaseUrl,
-            @Value("${app.security.api-key}") String apiKey
+            @Value("${app.security.api-key}") String apiKey,
+            @Value("${app.core.connect-timeout}") Duration connectTimeout,
+            @Value("${app.core.read-timeout}") Duration readTimeout
     ) {
+        HttpClient httpClient = HttpClient.newBuilder()
+                .connectTimeout(connectTimeout)
+                .build();
+        JdkClientHttpRequestFactory requestFactory = new JdkClientHttpRequestFactory(httpClient);
+        requestFactory.setReadTimeout(readTimeout);
         this.restClient = restClientBuilder
                 .baseUrl(coreBaseUrl)
                 .defaultHeader("x-api-key", apiKey)
+                .requestFactory(requestFactory)
                 .build();
     }
 
@@ -31,4 +43,3 @@ public class HttpCoreEventPublisher implements CoreEventPublisher {
                 .toBodilessEntity();
     }
 }
-
