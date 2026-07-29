@@ -1,0 +1,1105 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[
+  top=1.75cm,
+  left=1.75cm,
+  right=1.75cm,
+  bottom=2.25cm,
+  headheight=15pt,
+  footskip=0.9cm
+]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{amssymb}
+\usepackage[table]{xcolor}
+\usepackage{microtype}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{listings}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{lastpage}
+\usepackage{hyperref}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,fit,shapes.geometric,backgrounds}
+
+\definecolor{BolivarGreen}{HTML}{006B3C}
+\definecolor{BolivarDark}{HTML}{12352B}
+\definecolor{BolivarYellow}{HTML}{F6C344}
+\definecolor{SoftGreen}{HTML}{E8F4EE}
+\definecolor{SoftYellow}{HTML}{FFF6D8}
+\definecolor{SoftGray}{HTML}{F2F4F3}
+\definecolor{MidGray}{HTML}{64706B}
+\definecolor{CodeBackground}{HTML}{F6F8F7}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=BolivarGreen,
+  urlcolor=BolivarGreen,
+  citecolor=BolivarGreen,
+  pdftitle={Seguros Bolivar Full Stack Developer Technical Assessment},
+  pdfauthor={Nicolas Ceron},
+  pdfsubject={Policy Management Platform}
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\textcolor{BolivarGreen}{\textbf{Seguros Bolivar}}}
+\rhead{\textcolor{MidGray}{Technical Assessment}}
+\cfoot{\textcolor{MidGray}{Nicolas Ceron \textbar\ Page \thepage\ of \pageref{LastPage}}}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\headrule}{\hbox to\headwidth{\color{BolivarYellow}\leaders\hrule height \headrulewidth\hfill}}
+
+\titleformat{\section}
+  {\Large\bfseries\color{BolivarGreen}}
+  {\thesection}{0.7em}{}
+  [\vspace{-0.35em}\color{BolivarYellow}\titlerule]
+\titleformat{\subsection}
+  {\large\bfseries\color{BolivarDark}}
+  {\thesubsection}{0.6em}{}
+\titleformat{\subsubsection}
+  {\normalsize\bfseries\color{BolivarGreen}}
+  {\thesubsubsection}{0.5em}{}
+
+\setlist[itemize]{leftmargin=1.5em,itemsep=0.25em,topsep=0.35em}
+\setlist[enumerate]{leftmargin=1.7em,itemsep=0.35em,topsep=0.35em}
+\renewcommand{\arraystretch}{1.2}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.5em}
+\setlength{\emergencystretch}{3em}
+
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcommand{\req}[1]{\textcolor{BolivarGreen}{\textbf{#1}}}
+\newcommand{\good}{\textcolor{BolivarGreen}{\textbf{Implemented}}}
+\newcommand{\repo}{\href{https://github.com/nicoceron/seguros-bolivar-challenge}{github.com/nicoceron/seguros-bolivar-challenge}}
+
+\lstdefinestyle{assessment}{
+  backgroundcolor=\color{CodeBackground},
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{BolivarGreen}\bfseries,
+  stringstyle=\color{BolivarDark},
+  commentstyle=\color{MidGray}\itshape,
+  frame=single,
+  rulecolor=\color{SoftGray},
+  breaklines=true,
+  showstringspaces=false,
+  columns=fullflexible,
+  keepspaces=true,
+  xleftmargin=0.4em,
+  xrightmargin=0.4em
+}
+\lstset{style=assessment}
+
+\tikzset{
+  component/.style={
+    draw=BolivarGreen,
+    thick,
+    rounded corners=2pt,
+    fill=SoftGreen,
+    align=center,
+    minimum width=2.45cm,
+    minimum height=0.82cm,
+    font=\small
+  },
+  external/.style={
+    draw=BolivarDark,
+    thick,
+    rounded corners=2pt,
+    fill=SoftGray,
+    align=center,
+    minimum width=2.45cm,
+    minimum height=0.82cm,
+    font=\small
+  },
+  store/.style={
+    cylinder,
+    shape border rotate=90,
+    aspect=0.25,
+    draw=BolivarGreen,
+    thick,
+    fill=SoftYellow,
+    align=center,
+    minimum width=2.25cm,
+    minimum height=1cm,
+    font=\small
+  },
+  flow/.style={-{Latex[length=2.4mm]},thick,draw=BolivarDark},
+  event/.style={-{Latex[length=2.4mm]},thick,dashed,draw=BolivarGreen}
+}
+
+\begin{document}
+
+\begin{titlepage}
+  \thispagestyle{empty}
+  \begin{tikzpicture}[remember picture,overlay]
+    \fill[BolivarGreen]
+      (current page.north west)
+      rectangle ([yshift=-4.1cm]current page.north east);
+    \fill[BolivarYellow]
+      ([yshift=-4.1cm]current page.north west)
+      rectangle ([yshift=-4.35cm]current page.north east);
+    \fill[SoftGreen]
+      ([yshift=2.2cm]current page.south west)
+      rectangle (current page.south east);
+  \end{tikzpicture}
+
+  \vspace*{1.15cm}
+  {\color{white}\fontsize{15}{18}\selectfont FULL STACK DEVELOPER}\\[0.35cm]
+  {\color{white}\fontsize{30}{35}\selectfont\bfseries Technical Assessment}\\[0.3cm]
+  {\color{white}\Large Policy Management Platform}
+
+  \vspace{3.2cm}
+
+  \begin{tabularx}{\textwidth}{@{}L{3.4cm}Y@{}}
+    \textbf{Candidate} & Nicolas Ceron \\
+    \textbf{Delivery date} & July 29, 2026 \\
+    \textbf{Repository} & \repo \\
+    \textbf{Implementation} & Java 21, Spring Boot 4.1, PostgreSQL/H2 \\
+    \textbf{Document scope} & System Design, Practical API, Database Optimization,
+      Git Strategy, and Technical Leadership \\
+  \end{tabularx}
+
+  \vfill
+
+  \begin{center}
+    \colorbox{BolivarYellow}{
+      \parbox{0.86\textwidth}{
+        \centering\color{BolivarDark}\large\bfseries
+        Correctness first. Resilience by design. Simple to operate.
+      }
+    }
+  \end{center}
+
+  \vspace{1.5cm}
+  {\small\color{MidGray}
+    Submission filename: \texttt{Nicolas\_Ceron\_Prueba\_Tecnica.pdf}\\
+    Required deadline: Thursday, July 30, 2026 before 12:00 America/Bogota
+  }
+\end{titlepage}
+
+\section*{Executive Summary}
+\addcontentsline{toc}{section}{Executive Summary}
+
+The proposed platform is a \textbf{modular monolith} with explicit Policy, Risk,
+Notification, and CORE integration boundaries. This is the most responsible starting
+point for the stated domain: policy and risk transitions need strong consistency, while
+24/7 operation requires the legacy CORE to be isolated from the request path. The
+design can scale horizontally and each module has a clean extraction seam if evidence
+later justifies an independent service.
+
+The executable solution implements every mandatory route and rule. All state-changing
+operations update the relational model and create a CORE delivery intent in one database
+transaction. A transactional outbox dispatcher then calls the required agnostic
+WebLogic/CORE boundary with retries and a stable event identifier. A CORE outage
+therefore does not lose an accepted business change or make the public API unavailable.
+
+\begin{center}
+\begin{tabularx}{\textwidth}{@{}L{3.3cm}Y L{3.2cm}@{}}
+\toprule
+\rowcolor{SoftGreen}
+\textbf{Evaluation area} & \textbf{Design response} & \textbf{Evidence} \\
+\midrule
+Architecture & Modular boundaries, hexagonal CORE port, event-driven outbox &
+Sections 1.2-1.7 \\
+Code quality & Domain invariants, financial precision, validation, consistent errors &
+Section 2 and source \\
+Reliability & Asynchronous CORE delivery, retry/backoff, idempotency, optimistic locks &
+Sections 1.6 and 2.5 \\
+Operability & Health probes, metrics, structured logs, correlation identifiers, OpenAPI &
+Section 1.8 \\
+Leadership & Two-week stabilization plan plus guarded three-week delivery &
+Section 5 \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\tableofcontents
+\newpage
+
+\section{Module 1 - System Design}
+
+\subsection{Context, assumptions, and design goals}
+
+The business owns two rental-policy products:
+
+\begin{itemize}
+  \item \textbf{INDIVIDUAL}: the tenant is policyholder and insured party; the landlord
+    is beneficiary; exactly one rental risk exists.
+  \item \textbf{COLECTIVA}: a real-estate agency or co-property administration is the
+    policyholder; tenants are insured; landlords are beneficiaries; one or many rental
+    risks exist.
+\end{itemize}
+
+For every policy, premium is calculated as monthly rent multiplied by the initial
+duration in months. Renewal applies IPC as a percentage to monthly rent and premium,
+opens a new term of the original duration, and changes the state to \texttt{RENOVADA}.
+Cancellation is logical and auditable.
+
+The design optimizes for the following measurable quality attributes:
+
+\begin{tabularx}{\textwidth}{@{}L{3.1cm}L{3.5cm}Y@{}}
+\toprule
+\rowcolor{SoftGreen}
+\textbf{Attribute} & \textbf{Initial target} & \textbf{Design implication} \\
+\midrule
+Availability & 99.95\% monthly API availability & Multi-zone stateless instances,
+  health probes, no synchronous CORE dependency for accepted writes \\
+Read latency & p95 below 300 ms & Indexed filters, pagination, read replicas when needed \\
+Write latency & p95 below 600 ms & Local ACID transaction; external delivery is out-of-band \\
+Durability & RPO near zero for accepted writes & Synchronous multi-zone database commit,
+  point-in-time recovery, transactional outbox \\
+Recovery & RTO below 30 minutes & Automated deployment, tested backups, runbooks,
+  infrastructure as code \\
+Security & No unauthenticated business operation & Gateway authentication plus
+  service authorization; assessment API key is a minimal local control \\
+\bottomrule
+\end{tabularx}
+
+\subsection{High-level architecture}
+
+\begin{figure}[ht]
+\centering
+\resizebox{\textwidth}{!}{
+\begin{tikzpicture}[node distance=0.8cm and 1.05cm]
+  \node[external] (clients) {Web / Mobile\\Clients};
+  \node[component,right=of clients] (gateway) {API Gateway\\Auth, rate limits};
+
+  \node[component,right=1.2cm of gateway,yshift=1.3cm] (policy) {Policy Service\\commands + queries};
+  \node[component,right=1.2cm of gateway,yshift=-0.1cm] (risk) {Risk Service\\risk lifecycle};
+  \node[component,right=1.2cm of gateway,yshift=-1.5cm] (renewal) {Renewal Worker\\rule schedule};
+
+  \node[store,right=1.25cm of risk] (db) {Policy DB\\+ outbox};
+  \node[external,right=1.25cm of db,yshift=1.55cm] (broker) {Event Broker};
+  \node[component,right=1.15cm of broker] (notification) {Notification\\Service};
+  \node[external,right=1.05cm of notification] (channels) {Email / SMS\\Providers};
+
+  \node[component,right=1.25cm of db,yshift=-1.2cm] (adapter) {CORE Integration\\Adapter};
+  \node[external,right=1.15cm of adapter] (weblogic) {WebLogic\\Edit Service};
+  \node[external,right=1.05cm of weblogic] (core) {Legacy Insurance\\CORE};
+
+  \draw[flow] (clients) -- (gateway);
+  \draw[flow] (gateway) -- (policy);
+  \draw[flow] (gateway) -- (risk);
+  \draw[flow] (gateway) -- (renewal);
+  \draw[flow] (policy) -- (db);
+  \draw[flow] (risk) -- (db);
+  \draw[flow] (renewal) -- (db);
+  \draw[event] (db) -- node[above,font=\scriptsize]{domain events} (broker);
+  \draw[event] (broker) -- (notification);
+  \draw[flow] (notification) -- (channels);
+  \draw[event] (db) -- node[below,font=\scriptsize]{CORE outbox} (adapter);
+  \draw[flow] (adapter) -- (weblogic);
+  \draw[flow] (weblogic) -- (core);
+
+  \begin{scope}[on background layer]
+    \node[draw=BolivarGreen,dashed,rounded corners=4pt,fit=(policy)(risk)(renewal),
+      inner sep=0.35cm,label={[font=\small\bfseries,text=BolivarGreen]above:
+      Policy Management deployable}] {};
+  \end{scope}
+\end{tikzpicture}
+}
+\caption{Production component view. Solid lines are calls; dashed lines are durable
+asynchronous event flows.}
+\end{figure}
+
+\textbf{Deployment choice.} Policy, Risk, and Renewal are logical services implemented as
+modules in one Spring Boot deployable for the first release. Notification and the CORE
+adapter may run as separate workers because they have different scaling and failure
+profiles. If organizational ownership or traffic later requires extraction, module
+interfaces become remote contracts without rewriting the domain.
+
+\subsection{Three selected architectural patterns}
+
+\begin{longtable}{@{}L{2.9cm}L{5.4cm}L{6.0cm}@{}}
+\toprule
+\rowcolor{SoftGreen}
+\textbf{Pattern} & \textbf{Why it fits} & \textbf{Trade-off and control} \\
+\midrule
+\endhead
+\textbf{1. Modular monolith} &
+Policy and Risk have related invariants and must change atomically. A single deployable
+reduces network hops, distributed transactions, and 24/7 operational burden while still
+separating ownership in code. &
+Modules cannot scale independently at first. Track traffic and team coupling; extract a
+module only when measurements justify the cost. Database access remains private to each
+module through application interfaces. \\
+\addlinespace
+\textbf{2. Hexagonal architecture} &
+Business rules depend on ports, not WebLogic, HTTP, JPA, or notification vendors.
+The legacy CORE adapter is replaceable and can be tested with a fake. Controllers are
+inbound adapters; repositories and CORE clients are outbound adapters. &
+Adds interfaces and mapping code. Apply the pattern at real volatility boundaries
+(CORE, notifications, persistence), not to every class. \\
+\addlinespace
+\textbf{3. Event-driven integration with transactional outbox} &
+Creation and renewal notifications are naturally asynchronous. CORE availability must
+not dictate platform availability. A policy mutation and its delivery intent commit
+atomically, then workers deliver at least once. &
+Consumers may see events later or more than once. Use event IDs, idempotent consumers,
+bounded retry, a dead-letter state, lag alerts, and reconciliation with CORE. \\
+\bottomrule
+\end{longtable}
+
+\textbf{Why not microservices immediately?} The domain boundaries are real, but the
+assessment provides no traffic, team, or deployment evidence that compensates for
+distributed consistency and on-call complexity. The proposed modules preserve the
+option while choosing the safer first release.
+
+\subsection{Component responsibilities}
+
+\begin{tabularx}{\textwidth}{@{}L{3.4cm}Y@{}}
+\toprule
+\rowcolor{SoftGreen}
+\textbf{Component} & \textbf{Responsibility} \\
+\midrule
+API Gateway & TLS termination, OAuth2/OIDC validation, API-key compatibility, rate
+limits, request size limits, routing, WAF rules, and version routing. \\
+Policy Service & Create/query/modify policies; validate status transitions; calculate
+premium and IPC renewal; schedule automatic renewal; write domain and CORE outbox events. \\
+Risk Service & List/add/cancel risks; enforce collective-only addition and
+individual cardinality; cascade policy cancellation. \\
+Notification Service & Consume creation/renewal events; resolve templates and user
+preferences; deliver email/SMS; retry and record delivery outcome. \\
+CORE Integration Adapter & Translate canonical events to the agnostic WebLogic edit
+contract; apply timeouts/retry/circuit breaking; preserve event ID for idempotency;
+reconcile delivery state. \\
+Policy database & ACID system of record for the new platform, optimistic versions,
+auditable states, and outbox records. PostgreSQL is the production choice. \\
+Event broker & Durable fan-out, consumer isolation, replay, ordering by policy ID,
+and dead-letter routing. \\
+\bottomrule
+\end{tabularx}
+
+\subsection{Main data model}
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[node distance=1.2cm and 1.5cm]
+  \node[component,text width=5.3cm,align=left] (policy) {
+    \textbf{POLICY}\\
+    id, type, status, effectiveFrom, effectiveTo\\
+    initialDurationMonths, monthlyRent, premium\\
+    policyholder, beneficiary, version, timestamps
+  };
+  \node[component,text width=4.8cm,align=left,right=of policy] (risk) {
+    \textbf{RISK}\\
+    id, policyId, propertyAddress, tenantName\\
+    status, version, timestamps
+  };
+  \node[component,text width=5.3cm,align=left,below=of policy] (outbox) {
+    \textbf{CORE OUTBOX EVENT}\\
+    eventId, policyId, eventType, status\\
+    attempts, nextAttemptAt, lastError, sentAt
+  };
+  \node[component,text width=4.8cm,align=left,below=of risk] (audit) {
+    \textbf{AUDIT / DOMAIN EVENT}\\
+    eventId, aggregateId, actor, eventType\\
+    before/after or payload, occurredAt, traceId
+  };
+
+  \draw[flow] (policy) -- node[above,font=\small]{1 to many} (risk);
+  \draw[event] (policy) -- node[left,font=\small]{1 to many} (outbox);
+  \draw[event] (policy) -- node[above,sloped,font=\small]{emits} (audit);
+\end{tikzpicture}
+\caption{Logical data model. Audit/domain-event storage is a production extension;
+the practical implementation contains Policy, Risk, and CORE outbox.}
+\end{figure}
+
+\textbf{Key invariants}
+
+\begin{itemize}
+  \item \req{SD-04, BR-01}: an individual policy has exactly one risk; collective
+  creation requires at least one and may accept more.
+  \item \req{SD-06}: premium at creation is
+  \(\textit{monthlyRent} \times \textit{initialDurationMonths}\).
+  \item \req{SD-07, SD-08}: renewal opens a term with the original duration and applies
+  \(1 + \textit{IPC}/100\) to rent and premium.
+  \item \req{BR-02}: \texttt{CANCELADA} is terminal for renewal.
+  \item \req{BR-03}: policy cancellation moves every risk to \texttt{CANCELADO} in the
+  same transaction.
+  \item Monetary values use fixed precision; rows use optimistic versions to detect
+  concurrent changes.
+\end{itemize}
+
+\subsection{Critical write flow and CORE consistency}
+
+For a renewal:
+
+\begin{enumerate}
+  \item The gateway authenticates, rate-limits, and attaches a correlation ID.
+  \item The Policy command loads the current row with its optimistic version.
+  \item The domain rejects \texttt{CANCELADA}, validates IPC, recalculates values, and
+  advances the effective period.
+  \item One database transaction updates the policy and inserts a CORE outbox event.
+  \item The API returns the committed policy. CORE latency is not on the request path.
+  \item A worker reads due outbox events and calls the WebLogic agnostic edit service.
+  \item Success marks \texttt{SENT}. Failure records the reason and schedules bounded
+  exponential backoff. Exhausted events enter \texttt{FAILED} and alert operations.
+\end{enumerate}
+
+The delivery guarantee is \textbf{at least once}. The event UUID is the idempotency key.
+WebLogic/CORE should store or recognize processed IDs. If it cannot, the adapter uses a
+deduplication ledger. A scheduled reconciliation compares non-final outbox state and
+CORE policy state, closing the unavoidable dual-system consistency gap.
+
+\subsection{Automatic renewal and notifications}
+
+A renewal scheduler queries eligible policies in bounded pages. Work is partitioned by
+policy ID and claimed with a lease so multiple instances do not renew the same policy.
+The normal domain command executes the renewal, which means manual and automatic paths
+share all rules and CORE delivery behavior.
+
+Creation and renewal also write a notification event to the same outbox abstraction.
+The Notification Service independently delivers email and SMS. Provider failures never
+roll back the policy; each channel owns retry policy, suppression, delivery receipts,
+and a dead-letter queue. Message payloads reference policy IDs and template data rather
+than exposing unnecessary personal information.
+
+\subsection{Scalability, observability, fault tolerance, and API versioning}
+
+\subsubsection{Scalability}
+
+\begin{itemize}
+  \item Run stateless API instances across at least two availability zones behind a
+  load balancer; autoscale on CPU, request concurrency, and p95 latency.
+  \item Paginate every list; use the composite policy \texttt{(type, status)} index and
+  the risk \texttt{(policy\_id)} index. Add read replicas only after read pressure appears.
+  \item Batch and partition renewal/outbox workers; apply backpressure when CORE or
+  notification providers slow down.
+  \item Cache stable reference/configuration data, not mutable policy state by default.
+  \item Extract Notification or Risk only when independent scaling, ownership, or
+  deployment cadence provides measured value.
+\end{itemize}
+
+\subsubsection{Logs and observability}
+
+\begin{itemize}
+  \item Emit structured JSON in production with timestamp, severity, service, version,
+  environment, trace ID, policy ID, event ID, route, duration, and outcome.
+  \item Propagate W3C trace context through Gateway, API, broker, notification, WebLogic,
+  and CORE adapter. Never log API keys, phone numbers, or full sensitive payloads.
+  \item RED metrics: request rate, error rate, and duration per route. Domain metrics:
+  renewals, cancellations, risk additions, CORE success/failure, outbox lag and age.
+  \item SLO alerts should use burn rate, not isolated thresholds. Page for availability,
+  high error budget burn, stuck outbox, or reconciliation drift; ticket slow trends.
+  \item Dashboards link metrics to traces and structured logs. Every alert has an owner
+  and a short runbook.
+\end{itemize}
+
+\subsubsection{Fault tolerance}
+
+\begin{itemize}
+  \item Strict connect/read timeouts on WebLogic, email, and SMS; retry only transient,
+  idempotent operations with jitter. Circuit breakers prevent dependency failure storms.
+  \item Transactional outbox prevents lost events. Dead-letter state, replay tooling,
+  and reconciliation address long outages and poison events.
+  \item Optimistic locking rejects conflicting writes with HTTP 409 instead of silently
+  overwriting state.
+  \item PostgreSQL uses multi-zone replication, encrypted backups, point-in-time recovery,
+  and regularly tested restore procedures.
+  \item Graceful shutdown, liveness/readiness probes, rolling deployment, and minimum
+  healthy capacity preserve 24/7 service.
+  \item Chaos exercises cover CORE timeout, broker lag, database failover, and provider
+  outage before production launch.
+\end{itemize}
+
+\subsubsection{API versioning}
+
+The public production contract begins at \texttt{/api/v1}; the exact unversioned routes
+remain in the assessment implementation because they are explicitly required. Breaking
+changes use a new major path. Compatible field additions stay in the current version.
+OpenAPI is the contract, consumer-driven tests detect incompatibility, and gateway
+analytics identify active clients. A version receives a published deprecation window,
+\texttt{Deprecation} and \texttt{Sunset} headers, a migration guide, and an observed
+retirement date.
+
+\subsection{Security and privacy beyond the minimum}
+
+The required \texttt{x-api-key} is implemented using constant-time comparison and is
+externalized through \texttt{POLICY\_API\_KEY}; the literal \texttt{123456} exists only
+as the mandated local default. Production uses OAuth2/OIDC at the gateway, short-lived
+service credentials, role/ownership authorization, secret rotation, TLS/mTLS, encryption
+at rest, input and payload limits, rate limiting, audit logs, dependency scanning, and
+least-privilege database roles. Colombian personal data is minimized, retained by policy,
+masked in non-production, and excluded from logs and messages unless required.
+
+\newpage
+\section{Module 2 - Practical Technical Challenge}
+
+\subsection{Delivery and technology}
+
+\textbf{GitHub source:} \repo
+
+\begin{tabularx}{\textwidth}{@{}L{3.1cm}Y@{}}
+\toprule
+\rowcolor{SoftGreen}
+\textbf{Area} & \textbf{Implementation} \\
+\midrule
+Runtime & Java 21 target, Spring Boot 4.1, Maven \\
+Layers & Controllers, transactional application service, Spring Data repositories,
+  domain entities, outbound CORE adapter \\
+Persistence & PostgreSQL profile, H2 local profile, Flyway migration, JPA/Hibernate \\
+Security & Mandatory API-key filter and health-probe exception \\
+API documentation & OpenAPI 3 and Swagger UI \\
+Reliability & Transactional CORE outbox, retry/backoff, idempotent event UUID,
+  optimistic locking \\
+Operations & Actuator probes/metrics, Prometheus registry, correlation IDs,
+  structured console logs \\
+Validation & Jakarta Bean Validation plus domain-state invariants and RFC 9457-style
+  problem details \\
+Testing & 14 automated domain, adapter, and full-context MockMvc tests \\
+Delivery & Dockerfile, Compose, CI, Dependabot, Make targets, LaTeX build scripts \\
+\bottomrule
+\end{tabularx}
+
+\subsection{Endpoint implementation}
+
+\begin{longtable}{@{}L{4.8cm}L{3.2cm}L{6.0cm}@{}}
+\toprule
+\rowcolor{SoftGreen}
+\textbf{Route} & \textbf{Requirement} & \textbf{Implemented behavior} \\
+\midrule
+\endhead
+\texttt{GET /polizas} & \req{API-01} &
+Optional \texttt{tipo} and \texttt{estado}; stable ID ordering; page and size bounds;
+returns pagination metadata. \\
+\texttt{GET /polizas/\{id\}/riesgos} & \req{API-02} &
+Validates policy existence and returns risks in stable ID order. \\
+\texttt{POST /polizas/\{id\}/renovar} & \req{API-03} &
+Validates IPC, rejects cancelled state, increases rent/premium, advances the original
+duration, marks \texttt{RENOVADA}, and enqueues CORE update. \\
+\texttt{POST /polizas/\{id\}/cancelar} & \req{API-04} &
+Marks policy \texttt{CANCELADA}, cancels all risks atomically, enqueues CORE update. \\
+\texttt{POST /polizas/\{id\}/riesgos} & \req{API-05} &
+Rejects non-collective or cancelled policy, creates active risk, enqueues CORE update. \\
+\texttt{POST /riesgos/\{id\}/cancelar} & \req{API-06} &
+Marks the risk cancelled and enqueues an update for its policy. \\
+\texttt{POST /core-mock/evento} & \req{API-07} &
+Accepts the exact required JSON, writes a structured attempted-delivery log, returns 202. \\
+\bottomrule
+\end{longtable}
+
+Two small supporting routes make evaluation and the frontend journey self-contained:
+\texttt{POST /polizas} creates a valid policy and initial risks, and
+\texttt{GET /polizas/\{id\}} retrieves one policy.
+
+\subsection{Business-rule evidence}
+
+\begin{tabularx}{\textwidth}{@{}L{2.2cm}Y L{4.2cm}@{}}
+\toprule
+\rowcolor{SoftGreen}
+\textbf{Rule} & \textbf{Enforcement} & \textbf{Automated evidence} \\
+\midrule
+\req{BR-01} & Domain refuses a second individual risk; creation requires exactly one. &
+Domain test: individual risk limit \\
+\req{BR-02} & Renewal checks terminal cancellation state before financial mutation. &
+Domain/API cancelled-renewal tests \\
+\req{BR-03} & Policy aggregate cancels all child risks in one transaction. &
+Domain/API cascade tests \\
+\req{BR-04} & Add-risk use case requires \texttt{COLECTIVA}; domain also rejects
+cancelled policy. & API collective-type test \\
+\req{SEC-01} & Ordered request filter requires \texttt{x-api-key}; comparison is
+constant-time. & \texttt{requiresApiKey} \\
+\bottomrule
+\end{tabularx}
+
+\subsection{Run and verify}
+
+Zero-dependency mode:
+
+\begin{lstlisting}[language=bash]
+mvn spring-boot:run
+\end{lstlisting}
+
+PostgreSQL mode:
+
+\begin{lstlisting}[language=bash]
+docker compose up --build
+\end{lstlisting}
+
+Verification:
+
+\begin{lstlisting}[language=bash]
+mvn --batch-mode --no-transfer-progress verify
+\end{lstlisting}
+
+The API is available on \texttt{localhost:8080}; Swagger UI is
+\texttt{/swagger-ui.html}; health is \texttt{/actuator/health}. Two demo policies make
+manual testing immediate. The full command list and curl examples are in the repository
+README.
+
+\subsection{API request examples}
+
+\begin{lstlisting}[language=bash]
+# Filter policies
+curl -H 'x-api-key: 123456' \
+  'http://localhost:8080/polizas?tipo=COLECTIVA&estado=ACTIVA'
+
+# Renew by 5.2 percent IPC
+curl -X POST -H 'x-api-key: 123456' \
+  -H 'Content-Type: application/json' \
+  -d '{"ipcPercentage":5.20}' \
+  http://localhost:8080/polizas/1/renovar
+
+# Mandatory CORE mock
+curl -X POST -H 'x-api-key: 123456' \
+  -H 'Content-Type: application/json' \
+  -d '{"evento":"ACTUALIZACION","polizaId":555}' \
+  http://localhost:8080/core-mock/evento
+\end{lstlisting}
+
+\subsection{Implementation decisions that protect correctness}
+
+\begin{itemize}
+  \item \textbf{Aggregate methods own rules.} Invalid transitions cannot be bypassed by a
+  controller or future scheduler.
+  \item \textbf{Financial precision is explicit.} \texttt{BigDecimal}, two decimal places,
+  and \texttt{HALF\_UP} avoid floating-point errors.
+  \item \textbf{API errors are stable.} Problems contain HTTP status, machine code, path,
+  timestamp, and field errors without leaking internals.
+  \item \textbf{Concurrency is visible.} JPA versions produce 409 on conflicting updates.
+  \item \textbf{CORE intent is atomic.} A mutation cannot commit without its outbox row;
+  delivery failure does not lose the change.
+  \item \textbf{The evaluator can inspect behavior.} OpenAPI, sample data, health, metrics,
+  Docker, and tests minimize setup uncertainty.
+\end{itemize}
+
+\subsection{Known production extensions}
+
+The assessment keeps focus on the essential code. Before production, add gateway OIDC
+and authorization, notification outbox/schema, distributed outbox claiming, a real
+broker, immutable business audit history, PostgreSQL integration tests with Testcontainers,
+contract tests against WebLogic, secret manager integration, and performance/chaos tests.
+These are explicit extensions, not hidden assumptions.
+
+\newpage
+\section{Module 3 - Database Optimization}
+
+\subsection{Problem framing}
+
+The frequent query joins 10 million orders to 500,000 customers and filters customers by
+country:
+
+\begin{lstlisting}[language=SQL]
+SELECT
+  o.order_id,
+  o.order_date,
+  c.customer_name,
+  o.total_amount
+FROM orders o
+JOIN customers c ON o.customer_id = c.customer_id
+WHERE c.country = 'México';
+\end{lstlisting}
+
+The likely cost is a scan of customers to find Mexico followed by repeated or broad
+access to orders. The right choice depends on selectivity, distribution, result size,
+storage engine, and the actual plan. I would first collect a baseline with
+\texttt{EXPLAIN ANALYZE} (or Oracle \texttt{DBMS\_XPLAN.DISPLAY\_CURSOR}) and measure
+logical reads, physical reads, row estimates, join algorithm, spills, and p95 duration.
+
+\subsection{Strategy 1 - Composite and covering indexes}
+
+At minimum:
+
+\begin{lstlisting}[language=SQL]
+CREATE INDEX idx_customers_country_customer
+  ON customers(country, customer_id);
+
+CREATE INDEX idx_orders_customer
+  ON orders(customer_id);
+\end{lstlisting}
+
+The first index rapidly finds Mexico customer IDs; the second supports indexed joins to
+their orders. On engines with included columns, reduce table lookups:
+
+\begin{lstlisting}[language=SQL]
+-- PostgreSQL example
+CREATE INDEX idx_customers_country_cover
+  ON customers(country, customer_id)
+  INCLUDE (customer_name);
+
+CREATE INDEX idx_orders_customer_cover
+  ON orders(customer_id)
+  INCLUDE (order_id, order_date, total_amount);
+\end{lstlisting}
+
+I would not blindly create every covering index: on 10 million rows it increases storage,
+cache pressure, and write cost. Validate benefit with the real plan and workload, remove
+redundant indexes, and rebuild/reorganize only when measured fragmentation warrants it.
+
+\subsection{Strategy 2 - Accurate statistics and plan validation}
+
+Indexes fail when the optimizer estimates country selectivity incorrectly. Refresh
+statistics and histograms for \texttt{customers.country}, and statistics for join keys.
+In Oracle, use \texttt{DBMS\_STATS.GATHER\_TABLE\_STATS} with an appropriate histogram;
+in PostgreSQL, run \texttt{ANALYZE} and raise the statistics target for skewed country data.
+
+Then confirm the plan begins with filtered customers and uses an indexed nested-loop join
+when Mexico is selective, or a hash join when it is not. Check for implicit conversions,
+collation/Unicode mismatches, functions on \texttt{country}, stale bind peeking, and
+insufficient work memory causing hash/sort spills. Do not force a join hint until the
+root estimation problem is understood.
+
+\subsection{Strategy 3 - Materialized read model for a frequent expensive report}
+
+If this query is read frequently but the acceptable freshness is minutes rather than
+milliseconds, maintain a materialized view or reporting table containing the joined
+projection:
+
+\begin{lstlisting}[language=SQL]
+CREATE MATERIALIZED VIEW orders_by_country AS
+SELECT
+  c.country,
+  o.order_id,
+  o.order_date,
+  c.customer_name,
+  o.total_amount
+FROM customers c
+JOIN orders o ON o.customer_id = c.customer_id;
+
+CREATE INDEX idx_orders_by_country
+  ON orders_by_country(country, order_date);
+\end{lstlisting}
+
+Refresh incrementally/fast where the engine permits, or populate through change-data
+capture. This trades write/refresh complexity and controlled staleness for predictable
+read speed and isolates analytical load from the transactional path.
+
+\subsection{Strategy 4 - Denormalize/partition only at proven scale}
+
+Country belongs to Customer, so ordinary partitioning of Orders by country is impossible
+without denormalization. If country reports dominate and indexes/read models remain
+insufficient, copy a stable \texttt{customer\_country} onto Orders through a controlled
+event/CDC process, then partition by country or region. Partition pruning can eliminate
+most of 10 million rows.
+
+This is a later option: customer-country changes require backfill and correctness controls,
+and too many small country partitions can harm operations. Date partitioning may help
+retention and recent-period queries but does \emph{not} optimize the supplied unbounded
+query by itself.
+
+\subsection{Strategy 5 - Bound result cost and separate workloads}
+
+The result itself may contain millions of rows; no index makes transmitting every row
+cheap. Clarify the use case, add a date range and keyset pagination when valid, return
+aggregates for dashboards, or export asynchronously. Route reporting to a read replica
+or warehouse, configure adequate buffer cache and I/O, and enable parallel query only
+after concurrency tests. The success metric is end-to-end latency and database load,
+not merely a lower estimated plan cost.
+
+\subsection{Recommended execution order}
+
+\begin{enumerate}
+  \item Capture the current plan and workload baseline.
+  \item Add/validate the two join/filter indexes and refresh statistics.
+  \item Check cardinality, result size, and plan stability under representative parameters.
+  \item If the workload is still expensive, create a materialized read model and move
+  reporting away from the OLTP primary.
+  \item Consider denormalization/partitioning only with measured evidence and ownership
+  of the consistency cost.
+\end{enumerate}
+
+This gives five distinct strategies and prioritizes reversible, low-risk improvements
+before structural changes.
+
+\newpage
+\section{Module 4 - Git and GitHub}
+
+\subsection{Command and justification}
+
+Use \textbf{\texttt{git cherry-pick}} because the requirement is to bring one specific
+security-fix commit from \texttt{main}, not the other updates:
+
+\begin{lstlisting}[language=bash]
+git fetch origin
+git switch feature/new-login
+git status --short
+git cherry-pick -x <security-fix-commit-sha>
+\end{lstlisting}
+
+\texttt{-x} appends the original commit SHA to the new commit message, preserving an
+audit trail that is especially useful for a security fix. Cherry-pick applies only the
+selected patch and creates a new commit on \texttt{feature/new-login}; merge or rebase
+would incorporate unrelated \texttt{main} history and violate the requirement.
+
+\subsection{Safe operational sequence}
+
+\begin{enumerate}
+  \item Confirm the worktree is clean and inspect the source commit:
+  \begin{lstlisting}[language=bash]
+git show --stat --oneline <security-fix-commit-sha>
+  \end{lstlisting}
+  \item Cherry-pick with \texttt{-x}. If conflicts occur, resolve only after understanding
+  both security intent and feature behavior, stage resolved files, then:
+  \begin{lstlisting}[language=bash]
+git cherry-pick --continue
+  \end{lstlisting}
+  Abort safely with \texttt{git cherry-pick --abort} if the resolution is uncertain.
+  \item Run security-specific tests and the complete quality gate:
+  \begin{lstlisting}[language=bash]
+mvn verify
+  \end{lstlisting}
+  \item Push the branch and explain the backport in the pull request. Do not modify the
+  original \texttt{main} commit.
+\end{enumerate}
+
+If the security fix is composed of multiple inseparable commits, cherry-pick the ordered
+range or each required SHA, after confirming with the fix owner. The strategy remains
+selective rather than merging all of \texttt{main}.
+
+\newpage
+\section{Module 5 - Technical Leadership and Management}
+
+\subsection{Situation assessment}
+
+Ten critical incidents in one month show that reliability is already harming customers
+and delivery capacity. Forty percent technical debt, missing standards, and irregular
+review make a fixed three-week feature promise unsafe. The response is not to stop all
+delivery or accept uncontrolled risk: stabilize the highest-risk paths, reduce feature
+scope to a testable vertical slice, install a lightweight quality system, and make the
+trade-offs visible to the business.
+
+\subsection{Five priorities in the first two weeks}
+
+\begin{longtable}{@{}L{0.8cm}L{3.7cm}L{6.0cm}L{4.0cm}@{}}
+\toprule
+\rowcolor{SoftGreen}
+\textbf{\#} & \textbf{Priority} & \textbf{Actions in days 1-10} & \textbf{Exit evidence} \\
+\midrule
+\endhead
+1 & \textbf{Stabilize critical services} &
+Create an incident command rotation; review all ten incidents; identify top recurring
+failure modes; patch immediate hazards; define SLOs, alerts, owners, and runbooks for
+the critical journeys. &
+No unowned P0/P1; top causes mitigated; on-call and escalation tested. \\
+\addlinespace
+2 & \textbf{Make the three-week commitment honest} &
+Run a product/engineering risk workshop; define one thin vertical slice; state
+non-negotiable acceptance, security, observability, and rollback criteria; remove
+lower-value scope; demo twice weekly. &
+Signed scope, dependency map, release criteria, and forecast with confidence range. \\
+\addlinespace
+3 & \textbf{Install minimum engineering standards} &
+Adopt a Definition of Done, pull-request template, mandatory review, CI build/test,
+branch protection, ownership map, severity model, and small-change policy. &
+Every new change passes CI and review; emergency exception path is documented. \\
+\addlinespace
+4 & \textbf{Triage debt by risk, not percentage} &
+Create a debt register tied to incidents, security, latency, and change friction.
+Prioritize the few items in the feature path and recurring-incident path; reserve
+capacity and assign owners. &
+Top debt risks quantified; first remediation stories are in the active plan. \\
+\addlinespace
+5 & \textbf{Enable the team, especially juniors} &
+Map skills and ownership; pair each junior with a patient senior; define weekly learning
+goals and small production tasks; protect focus; hold short architecture and incident
+learning sessions. &
+Clear module ownership, pairing calendar, and observable competency goals. \\
+\bottomrule
+\end{longtable}
+
+\subsection{Two-week operating cadence}
+
+\begin{tabularx}{\textwidth}{@{}L{2.6cm}Y@{}}
+\toprule
+\rowcolor{SoftGreen}
+\textbf{Window} & \textbf{Focus} \\
+\midrule
+Days 1-2 & Incident triage, service health map, product scope/risk workshop, named owners. \\
+Days 3-5 & Fix top recurrence, establish CI/review/DoD, architecture spike for the thin
+feature slice, baseline metrics. \\
+Days 6-8 & Build vertical slice behind a feature flag, address debt on its critical path,
+pairing and review discipline, resilience tests. \\
+Days 9-10 & Integrated demo, load/failure test, release rehearsal, forecast update,
+retrospective and week-three go/no-go criteria. \\
+\bottomrule
+\end{tabularx}
+
+\subsection{Team organization for speed and quality}
+
+Organize eight developers into two outcome-oriented pods while keeping one shared
+technical system:
+
+\begin{itemize}
+  \item \textbf{Feature pod (4):} senior technical owner, two developers, and one junior.
+  Own the thin vertical slice end-to-end, including tests, telemetry, and rollout.
+  \item \textbf{Reliability/platform pod (3):} senior owner plus two developers. Own top
+  incident causes, CI, service safeguards, runbooks, and debt on the delivery path.
+  \item \textbf{Rotating incident captain (1 at a time):} shields both pods from
+  interruptions, coordinates incidents, and returns to normal work after the rotation.
+  This is a role drawn from the eight, not a ninth person.
+\end{itemize}
+
+Use a single prioritized board and daily 15-minute risk sync. Work in small batches;
+limit work in progress; swarm on blocked/high-risk tasks. Each important area has a
+primary and secondary owner. Juniors pair on real tasks with shrinking support rather
+than receiving isolated training projects. Seniors rotate review and pairing so
+mentoring does not become one person's permanent tax.
+
+\subsection{Metrics for area performance}
+
+Metrics are for system improvement, not individual ranking:
+
+\begin{tabularx}{\textwidth}{@{}L{3.2cm}Y L{4.0cm}@{}}
+\toprule
+\rowcolor{SoftGreen}
+\textbf{Dimension} & \textbf{Metrics} & \textbf{Decision enabled} \\
+\midrule
+Customer reliability & SLO attainment, error-budget burn, P0/P1 count, recurrence rate,
+MTTD, MTTR & Stop/rebalance feature work when reliability risk is excessive \\
+Delivery flow & Deployment frequency, lead time for changes, cycle time, WIP age,
+blocked time & Find bottlenecks and batch-size problems \\
+Change quality & Change failure rate, rollback rate, escaped defects, flaky-test rate &
+Improve tests/review/release controls \\
+Review health & Time to first review, PR age/size, review participation, rework &
+Protect flow without rewarding superficial approvals \\
+Technical health & Debt items tied to incidents, critical vulnerabilities, dependency
+age, coverage on changed critical code, build time & Target debt with business impact \\
+Team sustainability & On-call load, unplanned-work percentage, pulse survey, learning
+goals, bus factor & Detect burnout and ownership concentration \\
+Business outcome & Feature adoption, task success, support contacts, value hypothesis &
+Confirm the three-week feature solves the intended problem \\
+\bottomrule
+\end{tabularx}
+
+Initial targets are based on a two-week baseline, not invented benchmarks. Trends and
+service-level objectives matter more than a single green number.
+
+\subsection{Mandatory technical practices}
+
+\begin{enumerate}
+  \item Protected main branch; no direct pushes; CI must compile, test, scan dependencies,
+  and enforce formatting/static analysis.
+  \item At least one meaningful reviewer; two or a code-owner review for critical/security
+  changes. Small PRs with context, risk, test evidence, and rollback notes.
+  \item Definition of Done: acceptance tests, automated tests at the right level,
+  telemetry, security/privacy review, documentation, feature flag/rollback, and no new
+  unowned high-severity issue.
+  \item Trunk-oriented short-lived branches, frequent integration, and feature flags.
+  \item Production readiness for critical services: SLO, dashboard, actionable alert,
+  runbook, owner, capacity check, backup/restore proof, and dependency timeout behavior.
+  \item Blameless incident response with severity, incident commander, timeline,
+  communication intervals, learning review, and tracked actions.
+  \item Architecture Decision Records for material choices; threat modeling for new data
+  flows; secret scanning and least privilege.
+\end{enumerate}
+
+Emergency changes may use an expedited review, but never skip traceability and automated
+smoke tests; retrospective review follows within one business day.
+
+\subsection{Managing business pressure without compromising quality}
+
+\begin{enumerate}
+  \item \textbf{Translate risk into options.} Present a three-option decision:
+  (A) thin safe slice in three weeks, (B) broader scope with a later date, or
+  (C) controlled beta in three weeks with restricted users. Quantify customer, incident,
+  and opportunity impact.
+  \item \textbf{Fix quality floors, flex scope.} Security, data correctness, observability,
+  rollback, and tests are non-negotiable. Nice-to-have journeys and polish move behind
+  feature flags or to the next increment.
+  \item \textbf{Deliver evidence every few days.} Demo a walking skeleton early, test
+  risky integrations first, and publish forecast/risk updates twice weekly.
+  \item \textbf{Use progressive delivery.} Dark launch, internal users, 5\% canary,
+  monitored ramp, explicit stop conditions, and rapid rollback.
+  \item \textbf{Escalate decisions, not anxiety.} When scope/date/quality cannot all hold,
+  document the trade-off, recommend one option, name the accountable decision-maker,
+  and record the decision.
+\end{enumerate}
+
+For this case I recommend the thin vertical slice in three weeks, reserving roughly
+30\% capacity for reliability/debt during weeks one and two, then adjusting from incident
+load and feature risk. A critical SLO burn or unresolved security issue triggers a
+release stop. This protects customers and gives the business a predictable, demonstrable
+outcome rather than an optimistic scope promise.
+
+\newpage
+\section{Requirement Traceability and Delivery Checklist}
+
+\subsection{Traceability summary}
+
+\begin{longtable}{@{}L{3.1cm}L{5.0cm}L{6.0cm}@{}}
+\toprule
+\rowcolor{SoftGreen}
+\textbf{Requirement group} & \textbf{Document evidence} & \textbf{Repository evidence} \\
+\midrule
+\endhead
+\req{SD-01 to SD-16} Domain and platform capabilities &
+Sections 1.1, 1.4-1.7 &
+Domain entities, application service, CORE outbox/adapter, demo setup \\
+\req{SD-17 to SD-24} Required design answers &
+Sections 1.2-1.9 and both diagrams &
+README architecture and configuration \\
+\req{API-01 to API-07} Mandatory endpoints &
+Section 2.2 &
+PolicyController, RiskController, CoreMockController, integration tests \\
+\req{BR-01 to BR-04} Business rules &
+Sections 1.5 and 2.3 &
+Policy aggregate, PolicyService, domain/API tests \\
+\req{SEC-01} API key &
+Sections 1.9 and 2.3 &
+ApiKeyFilter and rejection test \\
+\req{CODE-01 to CODE-05} Practical delivery &
+Sections 2.1-2.6 &
+Spring Boot layers, README, OpenAPI, Docker, CI \\
+\req{DB-01 to DB-02} SQL optimization &
+Section 3: five strategies and execution order &
+Written answer in LaTeX/PDF \\
+\req{GIT-01 to GIT-02} Selective security fix &
+Section 4: \texttt{cherry-pick -x} and safety sequence &
+Professional topic/merge history in repository \\
+\req{LEAD-01 to LEAD-05} Leadership &
+Section 5: priorities, organization, metrics, practices, pressure &
+Written answer in LaTeX/PDF \\
+\req{SUB-01 to SUB-07} Submission constraints &
+This unified document and checklist &
+Build/package scripts and required filenames \\
+\bottomrule
+\end{longtable}
+
+The complete line-by-line register, including implicit evaluation criteria, remains in
+\texttt{REQUIREMENTS.md} at the repository root.
+
+\subsection{Final delivery checklist}
+
+\begin{itemize}
+  \item[$\square$] PDF filename is
+  \texttt{Nicolas\_Ceron\_Prueba\_Tecnica.pdf}.
+  \item[$\square$] Optional source package is
+  \texttt{Nicolas\_Ceron\_Prueba\_Tecnica.zip}.
+  \item[$\square$] PDF is readable, unencrypted, contains all five modules, and embeds no
+  loose image dependency.
+  \item[$\square$] GitHub repository is accessible:
+  \repo.
+  \item[$\square$] \texttt{mvn verify} passes and the packaged JAR smoke test passes.
+  \item[$\square$] Repository contains README execution instructions and exact API key.
+  \item[$\square$] Email/upload completes before Thursday, July 30, 2026 at 12:00
+  America/Bogota.
+\end{itemize}
+
+\section*{Closing Note}
+\addcontentsline{toc}{section}{Closing Note}
+
+The implementation intentionally demonstrates production judgment without hiding the
+assessment's essential behavior behind unnecessary infrastructure. The core business
+rules are executable and tested; reliability around the legacy system is explicit; the
+system design has measurable operating targets; and the leadership plan balances a real
+delivery commitment with customer safety.
+
+\vfill
+\begin{center}
+\colorbox{SoftGreen}{
+  \parbox{0.9\textwidth}{
+    \centering
+    \textbf{\color{BolivarGreen}Repository and executable source}\\[0.2em]
+    \repo
+  }
+}
+\end{center}
+
+\end{document}
