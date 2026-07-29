@@ -1,0 +1,22 @@
+# Build outputs
+target/
+build/
+out/
+
+# IDE and operating-system files
+.idea/
+.vscode/
+*.iml
+.DS_Store
+
+# Runtime and local configuration
+*.log
+.env
+.env.*
+!.env.example
+
+# Generated assessment artifacts and temporary files
+tmp/
+output/
+docs/build/
+
