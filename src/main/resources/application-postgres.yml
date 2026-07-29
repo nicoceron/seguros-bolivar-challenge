@@ -1,0 +1,6 @@
+spring:
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/policies}
+    username: ${DATABASE_USERNAME:policies}
+    password: ${DATABASE_PASSWORD:policies}
+
