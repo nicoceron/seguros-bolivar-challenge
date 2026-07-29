@@ -1,0 +1,36 @@
+services:
+  database:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: policies
+      POSTGRES_USER: policies
+      POSTGRES_PASSWORD: policies
+    ports:
+      - "5432:5432"
+    volumes:
+      - policy-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U policies -d policies"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build: .
+    environment:
+      SPRING_PROFILES_ACTIVE: postgres
+      DATABASE_URL: jdbc:postgresql://database:5432/policies
+      DATABASE_USERNAME: policies
+      DATABASE_PASSWORD: policies
+      POLICY_API_KEY: ${POLICY_API_KEY:-123456}
+      CORE_BASE_URL: http://api:8080
+      DEMO_DATA_ENABLED: "true"
+    ports:
+      - "8080:8080"
+    depends_on:
+      database:
+        condition: service_healthy
+
+volumes:
+  policy-db:
+
