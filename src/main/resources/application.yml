@@ -45,8 +45,10 @@ app:
     read-timeout: 3s
     dispatch-delay-ms: 1000
     max-attempts: 5
+    dispatch-enabled: ${CORE_DISPATCH_ENABLED:true}
+  demo-data:
+    enabled: ${DEMO_DATA_ENABLED:true}
 
 logging:
   pattern:
     console: "%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX} level=%-5level service=${spring.application.name} trace=%X{traceId:-none} logger=%logger{36} message=\"%msg\"%n"
-
