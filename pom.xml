@@ -13,7 +13,7 @@
 
   <groupId>com.segurosbolivar</groupId>
   <artifactId>policy-management-api</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>1.0.0</version>
   <name>Seguros Bolivar Policy Management API</name>
   <description>Technical assessment - resilient rental policy management</description>
 
