@@ -160,7 +160,10 @@
   notification events.
 \end{itemize}
 
-\subsection{High-level architecture}
+\subsection{Questions 1 and 5 - What is the high-level architecture and component diagram?}
+
+\textit{Design the system's high-level architecture and diagram the Policy, Risk,
+Notification, CORE Integration Adapter, database, and API Gateway components.}
 
 \begin{figure}[ht]
 \centering
@@ -202,7 +205,7 @@ Rule-based automatic renewal is executed by a scheduled worker that selects elig
 policies and invokes the same renewal use case as the API. Creation and renewal events
 are consumed by the Notification Service for email and SMS delivery.
 
-\subsection{Three selected architectural patterns}
+\subsection{Question 2 - Which three architectural patterns would you select, and why?}
 
 \begin{tabularx}{\textwidth}{@{}L{3.0cm}Y@{}}
 \toprule
@@ -223,7 +226,9 @@ preventing lost updates. \\
 \bottomrule
 \end{tabularx}
 
-\subsection{Main data model}
+\subsection{Question 3 - What is the main data model?}
+
+\textit{Describe the principal data model without detailed SQL.}
 
 \textbf{Policy} stores identity, type, status, effective dates, original duration,
 monthly rent, premium, policyholder, beneficiary, and optimistic version.
@@ -236,7 +241,9 @@ An individual policy is validated to have exactly one risk; a collective policy 
 or more. A cancelled policy cannot renew. Cancelling a policy cancels every risk in the
 same transaction.
 
-\subsection{Scalability, logs, fault tolerance, and API versioning}
+\subsection{Question 4 - How would you handle the required operational concerns?}
+
+\textit{Explain scalability, logs and observability, fault tolerance, and API versioning.}
 
 \begin{tabularx}{\textwidth}{@{}L{3.0cm}Y@{}}
 \toprule
@@ -263,6 +270,10 @@ period. The assessment routes remain unprefixed exactly as requested. \\
 \end{tabularx}
 
 \section{Module 2 - Practical API}
+
+\textbf{Assessment task.} Implement only the essential policy-management API: the seven
+specified endpoints, four business rules, CORE mock, mandatory API-key header, Spring
+Boot layers, basic Policy/Risk entities, functional validations, and README instructions.
 
 \textbf{Source code:} \repo
 
@@ -326,8 +337,11 @@ the repository README.
 \clearpage
 \section{Module 3 - Database Optimization}
 
-The supplied query joins approximately 10 million orders with 500,000 customers and
-filters customers from Mexico. I would first capture the actual plan with
+\textbf{Question.} Given approximately 10 million orders, 500,000 customers, and the
+following slow query for customers from Mexico, describe at least three different
+optimization strategies.
+
+\textbf{Answer.} I would first capture the actual plan with
 \texttt{EXPLAIN ANALYZE} and measure row estimates, logical reads, join method, spills,
 and elapsed time.
 
@@ -369,8 +383,11 @@ tables; the trade-off is refresh complexity and controlled data staleness.
 
 \section{Module 4 - Git}
 
-To bring only the urgent security fix from \texttt{main} into
-\texttt{feature/new-login}, use \texttt{cherry-pick}:
+\textbf{Question.} While working on \texttt{feature/new-login}, a critical security fix
+is merged into \texttt{main}. How would you incorporate only that specific change without
+bringing the other updates from \texttt{main}, and why?
+
+\textbf{Answer.} Use \texttt{cherry-pick}:
 
 \begin{lstlisting}[language=bash]
 git fetch origin
@@ -391,7 +408,7 @@ The team has eight developers, 40\% technical debt in key services, ten critical
 incidents in the last month, a three-week feature deadline, inconsistent reviews and
 standards, and two junior developers who need support.
 
-\subsection{Five priorities for the first two weeks}
+\subsection{Question 1 - What are your five priorities in the first two weeks?}
 
 \begin{tabularx}{\textwidth}{@{}L{0.55cm}L{3.4cm}Y@{}}
 \toprule
@@ -416,7 +433,7 @@ goals, and share incident and architecture knowledge across the team. \\
 \bottomrule
 \end{tabularx}
 
-\subsection{Team organization}
+\subsection{Question 2 - How would you organize the team to improve speed and quality?}
 
 Create two four-person pods: a \textbf{feature pod} responsible for the thin vertical
 slice and a \textbf{reliability pod} responsible for recurring incidents, delivery
@@ -425,7 +442,7 @@ mentor. Rotate an incident captain from the team so other developers retain focu
 Use one prioritized board, limited work in progress, daily risk coordination, small
 changes, and shared primary/secondary ownership.
 
-\subsection{Performance metrics}
+\subsection{Question 3 - Which metrics would you use to evaluate area performance?}
 
 \begin{itemize}
   \item \textbf{Reliability:} SLO attainment, critical incident count and recurrence,
@@ -440,7 +457,7 @@ changes, and shared primary/secondary ownership.
 
 Metrics are evaluated as team and service trends, not as individual rankings.
 
-\subsection{Mandatory engineering practices}
+\subsection{Question 4 - Which technical practices would you make mandatory?}
 
 \begin{itemize}
   \item Protected main branch, CI checks, dependency/security scanning, and no direct
@@ -455,7 +472,7 @@ Metrics are evaluated as team and service trends, not as individual rankings.
   architecture decisions recorded for material changes.
 \end{itemize}
 
-\subsection{Managing business pressure}
+\subsection{Question 5 - How would you manage business pressure without sacrificing quality?}
 
 Quality floors for security, data correctness, testing, observability, and rollback do
 not move; scope does. I would present three explicit options: a safe thin slice in three
