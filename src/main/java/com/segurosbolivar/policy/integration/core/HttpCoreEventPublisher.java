@@ -35,11 +35,15 @@ public class HttpCoreEventPublisher implements CoreEventPublisher {
 
     @Override
     public void publish(CoreEventPayload event) {
-        restClient.post()
+        var response = restClient.post()
                 .uri("/core-mock/evento")
                 .contentType(MediaType.APPLICATION_JSON)
+                .header("Idempotency-Key", event.eventId().toString())
                 .body(event)
                 .retrieve()
                 .toBodilessEntity();
+        if (!response.getStatusCode().is2xxSuccessful()) {
+            throw new IllegalStateException("CORE did not acknowledge the event: " + response.getStatusCode());
+        }
     }
 }

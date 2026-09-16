@@ -13,6 +13,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 
 class CoreOutboxProcessorTest {
@@ -29,7 +31,7 @@ class CoreOutboxProcessorTest {
     @Test
     void marksSuccessfulDeliveryAsSent() {
         CoreOutboxEvent event = new CoreOutboxEvent(42L);
-        when(repository.findById(event.getId())).thenReturn(Optional.of(event));
+        when(repository.findByIdForUpdate(event.getId())).thenReturn(Optional.of(event));
 
         processor.process(event.getId());
 
@@ -41,7 +43,7 @@ class CoreOutboxProcessorTest {
     @Test
     void schedulesRetryWhenCoreIsUnavailable() {
         CoreOutboxEvent event = new CoreOutboxEvent(42L);
-        when(repository.findById(event.getId())).thenReturn(Optional.of(event));
+        when(repository.findByIdForUpdate(event.getId())).thenReturn(Optional.of(event));
         doThrow(new IllegalStateException("CORE unavailable"))
                 .when(publisher)
                 .publish(any(CoreEventPayload.class));
@@ -52,5 +54,33 @@ class CoreOutboxProcessorTest {
         assertThat(event.getAttempts()).isEqualTo(1);
         assertThat(event.getLastError()).contains("CORE unavailable");
     }
-}
+    @Test
+    void alreadySentEventsAreNotPublishedAgain() {
+        CoreOutboxEvent event = new CoreOutboxEvent(42L);
+        when(repository.findByIdForUpdate(event.getId())).thenReturn(Optional.of(event));
+        processor.process(event.getId());
+        processor.process(event.getId());
+        verify(publisher, times(1)).publish(any(CoreEventPayload.class));
+    }
 
+    @Test
+    void respectsBackoffEvenWhenAnotherWorkerHasAStaleBatch() {
+        CoreOutboxEvent event = new CoreOutboxEvent(42L);
+        event.markFailed("Retry later", 5);
+        when(repository.findByIdForUpdate(event.getId())).thenReturn(Optional.of(event));
+        processor.process(event.getId());
+        verifyNoInteractions(publisher);
+        assertThat(event.getAttempts()).isEqualTo(1);
+    }
+
+    @Test
+    void exhaustedEventsAreRetainedAsFailedWithoutFurtherDelivery() {
+        CoreOutboxEvent event = new CoreOutboxEvent(42L);
+        for (int i = 0; i < 5; i++) { event.markFailed("CORE unavailable", 5); }
+        when(repository.findByIdForUpdate(event.getId())).thenReturn(Optional.of(event));
+        processor.process(event.getId());
+        verifyNoInteractions(publisher);
+        assertThat(event.getStatus()).isEqualTo(OutboxStatus.FAILED);
+        assertThat(event.getAttempts()).isEqualTo(5);
+    }
+}

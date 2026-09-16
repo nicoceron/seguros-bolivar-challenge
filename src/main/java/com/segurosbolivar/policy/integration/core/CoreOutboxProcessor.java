@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
+import java.time.Instant;
 
 @Service
 public class CoreOutboxProcessor {
@@ -38,8 +39,11 @@ public class CoreOutboxProcessor {
 
     @Transactional
     public void process(UUID eventId) {
-        CoreOutboxEvent event = repository.findById(eventId).orElse(null);
+        CoreOutboxEvent event = repository.findByIdForUpdate(eventId).orElse(null);
         if (event == null || event.getStatus() != com.segurosbolivar.policy.integration.outbox.OutboxStatus.PENDING) {
+            return;
+        }
+        if (event.getNextAttemptAt().isAfter(Instant.now())) {
             return;
         }
         try {

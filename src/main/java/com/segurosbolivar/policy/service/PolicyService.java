@@ -10,6 +10,7 @@ import com.segurosbolivar.policy.domain.Policy;
 import com.segurosbolivar.policy.domain.PolicyStatus;
 import com.segurosbolivar.policy.domain.PolicyType;
 import com.segurosbolivar.policy.domain.Risk;
+import com.segurosbolivar.policy.domain.RiskStatus;
 import com.segurosbolivar.policy.integration.outbox.CoreOutboxEvent;
 import com.segurosbolivar.policy.repository.CoreOutboxEventRepository;
 import com.segurosbolivar.policy.repository.PolicyRepository;
@@ -83,6 +84,11 @@ public class PolicyService {
             );
         }
 
+        if (request.type() == PolicyType.INDIVIDUAL
+                && !request.policyholderName().trim().equals(request.risks().getFirst().tenantName().trim())) {
+            throw new DomainRuleViolationException("INDIVIDUAL_HOLDER_MUST_BE_TENANT",
+                    "The individual policyholder and insured tenant must be the same person");
+        }
         Policy policy = new Policy(
                 request.type(),
                 request.effectiveFrom(),
@@ -102,23 +108,27 @@ public class PolicyService {
 
     @Transactional
     public PolicyResponse renew(long policyId, BigDecimal ipcPercentage) {
-        Policy policy = requirePolicy(policyId);
+        Policy policy = requirePolicyForUpdate(policyId);
         policy.renew(ipcPercentage);
         enqueueCoreUpdate(policyId);
+        policyRepository.flush();
         return PolicyResponse.from(policy);
     }
 
     @Transactional
     public PolicyResponse cancelPolicy(long policyId) {
-        Policy policy = requirePolicy(policyId);
-        policy.cancel();
-        enqueueCoreUpdate(policyId);
+        Policy policy = requirePolicyForUpdate(policyId);
+        if (policy.getStatus() != PolicyStatus.CANCELADA) {
+            policy.cancel();
+            enqueueCoreUpdate(policyId);
+            policyRepository.flush();
+        }
         return PolicyResponse.from(policy);
     }
 
     @Transactional
     public RiskResponse addRisk(long policyId, RiskRequest request) {
-        Policy policy = requirePolicy(policyId);
+        Policy policy = requirePolicyForUpdate(policyId);
         if (policy.getType() != PolicyType.COLECTIVA) {
             throw new DomainRuleViolationException(
                     "COLLECTIVE_POLICY_REQUIRED",
@@ -134,14 +144,35 @@ public class PolicyService {
 
     @Transactional
     public RiskResponse cancelRisk(long riskId) {
-        Risk risk = riskRepository.findById(riskId)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "RISK_NOT_FOUND",
-                        "Risk %d was not found".formatted(riskId)
-                ));
-        risk.cancel();
-        enqueueCoreUpdate(risk.getPolicy().getId());
+        long policyId = riskRepository.findPolicyIdByRiskId(riskId)
+                .orElseThrow(() -> riskNotFound(riskId));
+        requirePolicyForUpdate(policyId);
+        Risk risk = requireRisk(riskId);
+        if (risk.getStatus() != RiskStatus.CANCELADO) {
+            risk.cancel();
+            enqueueCoreUpdate(policyId);
+            riskRepository.flush();
+        }
         return RiskResponse.from(risk);
+    }
+
+    @Transactional(readOnly = true)
+    public RiskResponse getRisk(long riskId) {
+        return RiskResponse.from(requireRisk(riskId));
+    }
+
+    private Risk requireRisk(long riskId) {
+        return riskRepository.findById(riskId).orElseThrow(() -> riskNotFound(riskId));
+    }
+
+    private ResourceNotFoundException riskNotFound(long riskId) {
+        return new ResourceNotFoundException("RISK_NOT_FOUND", "Risk %d was not found".formatted(riskId));
+    }
+
+    private Policy requirePolicyForUpdate(long policyId) {
+        return policyRepository.findByIdForUpdate(policyId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "POLICY_NOT_FOUND", "Policy %d was not found".formatted(policyId)));
     }
 
     private Policy requirePolicy(long policyId) {

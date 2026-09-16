@@ -5,6 +5,8 @@ import com.segurosbolivar.policy.service.ResourceNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.dao.PessimisticLockingFailureException;
+import java.time.DateTimeException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
@@ -71,7 +73,8 @@ public class ApiExceptionHandler {
             ConstraintViolationException.class,
             MethodArgumentTypeMismatchException.class,
             HttpMessageNotReadableException.class,
-            IllegalArgumentException.class
+            IllegalArgumentException.class,
+            DateTimeException.class
     })
     ResponseEntity<ProblemDetail> invalidRequest(
             Exception exception,
@@ -86,9 +89,9 @@ public class ApiExceptionHandler {
         );
     }
 
-    @ExceptionHandler(OptimisticLockingFailureException.class)
+    @ExceptionHandler({OptimisticLockingFailureException.class, PessimisticLockingFailureException.class})
     ResponseEntity<ProblemDetail> concurrentUpdate(
-            OptimisticLockingFailureException exception,
+            RuntimeException exception,
             HttpServletRequest request
     ) {
         return problem(
@@ -119,4 +122,5 @@ public class ApiExceptionHandler {
         return ResponseEntity.status(status).body(problem);
     }
 }
+
 

@@ -15,12 +15,16 @@ public final class Money {
         if (value == null) {
             throw new IllegalArgumentException("Monetary value is required");
         }
-        return value.setScale(SCALE, ROUNDING);
+        BigDecimal normalized = value.setScale(SCALE, ROUNDING);
+        if (normalized.precision() > 19) {
+            throw new IllegalArgumentException("Monetary value exceeds NUMERIC(19,2)");
+        }
+        return normalized;
     }
 
     public static BigDecimal increaseByPercentage(BigDecimal value, BigDecimal percentage) {
         BigDecimal factor = BigDecimal.ONE.add(
-                percentage.divide(BigDecimal.valueOf(100), 8, ROUNDING)
+                percentage.movePointLeft(2)
         );
         return normalize(value.multiply(factor));
     }

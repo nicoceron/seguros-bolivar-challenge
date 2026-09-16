@@ -26,7 +26,7 @@ public class CorrelationIdFilter extends OncePerRequestFilter {
             FilterChain filterChain
     ) throws ServletException, IOException {
         String traceId = request.getHeader(CORRELATION_HEADER);
-        if (traceId == null || traceId.isBlank() || traceId.length() > 100) {
+        if (traceId == null || !traceId.matches("[A-Za-z0-9._:-]{1,100}")) {
             traceId = UUID.randomUUID().toString();
         }
         MDC.put("traceId", traceId);
