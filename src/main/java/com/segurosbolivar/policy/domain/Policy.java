@@ -84,8 +84,8 @@ public class Policy {
             String policyholderName,
             String beneficiaryName
     ) {
-        if (durationMonths < 1) {
-            throw new IllegalArgumentException("Duration must be at least one month");
+        if (durationMonths < 1 || durationMonths > 1200) {
+            throw new IllegalArgumentException("Duration must be between 1 and 1200 months");
         }
         this.type = Objects.requireNonNull(type, "Policy type is required");
         this.effectiveFrom = Objects.requireNonNull(effectiveFrom, "Effective start is required");
@@ -113,16 +113,23 @@ public class Policy {
 
     public void renew(BigDecimal ipcPercentage) {
         ensureNotCancelled("A cancelled policy cannot be renewed");
-        if (ipcPercentage == null || ipcPercentage.signum() < 0) {
+        if (ipcPercentage == null || ipcPercentage.signum() < 0
+                || ipcPercentage.compareTo(new BigDecimal("100")) > 0) {
             throw new DomainRuleViolationException(
                     "INVALID_IPC",
-                    "IPC percentage must be zero or greater"
+                    "IPC percentage must be between zero and 100"
             );
         }
-        monthlyRent = Money.increaseByPercentage(monthlyRent, ipcPercentage);
-        premium = Money.increaseByPercentage(premium, ipcPercentage);
-        effectiveFrom = effectiveTo.plusDays(1);
-        effectiveTo = effectiveFrom.plusMonths(initialDurationMonths).minusDays(1);
+        // Round rent once, then derive the premium: this preserves premium = rent * months.
+        BigDecimal renewedRent = Money.increaseByPercentage(monthlyRent, ipcPercentage);
+        BigDecimal renewedPremium = Money.normalize(
+                renewedRent.multiply(BigDecimal.valueOf(initialDurationMonths)));
+        LocalDate renewedFrom = effectiveTo.plusDays(1);
+        LocalDate renewedTo = renewedFrom.plusMonths(initialDurationMonths).minusDays(1);
+        monthlyRent = renewedRent;
+        premium = renewedPremium;
+        effectiveFrom = renewedFrom;
+        effectiveTo = renewedTo;
         status = PolicyStatus.RENOVADA;
     }
 
