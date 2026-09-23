@@ -69,11 +69,15 @@ public class ApiKeyFilter extends OncePerRequestFilter {
     }
 
     @Override
-    /** Lets Docker check health without a key; also allows the error route. */
+    /** Lets the browser load Swagger and Docker check health; API operations still require the key. */
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
         return path.equals("/error")
                 || path.equals("/actuator/health")
-                || path.startsWith("/actuator/health/");
+                || path.startsWith("/actuator/health/")
+                || path.equals("/swagger-ui.html")
+                || path.startsWith("/swagger-ui/")
+                || path.equals("/v3/api-docs")
+                || path.startsWith("/v3/api-docs/");
     }
 }

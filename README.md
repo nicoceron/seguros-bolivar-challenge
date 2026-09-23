@@ -83,7 +83,7 @@ curl -i -X POST -H 'x-api-key: 123456' -H 'Content-Type: application/json' \
 
 **Límite distribuido.** Respuesta exitosa = cambio local + envío pendiente, no confirmación del CORE. Un fallo después del HTTP y antes del commit puede repetir una entrega; el receptor real debe deduplicar. El mock solo escribe logs, no deduplica ni demuestra actualización de un CORE. Integrar WebLogic real exige adaptar contrato, autenticación, orden por póliza y conciliación. Broker, correo/SMS, Gateway, alta disponibilidad y renovación automática se describen en el módulo 1; no están implementados en este ejercicio esencial.
 
-**Seguridad.** `123456` es exclusivamente la clave exigida para la prueba. En despliegue, cambiar `POLICY_API_KEY`, usar TLS y gestión de secretos. La API key no sustituye autorización por usuario/tenant. Las sondas de salud y el despacho interno de errores se exceptúan del filtro; Swagger y métricas requieren la clave. Para Swagger en navegador se necesita un cliente que inyecte ese header; no se expone una UI sin autenticación.
+**Seguridad.** `123456` es exclusivamente la clave exigida para la prueba. En despliegue, cambiar `POLICY_API_KEY`, usar TLS y gestión de secretos. La API key no sustituye autorización por usuario/tenant. Las sondas de salud, el despacho interno de errores y la documentación Swagger se exceptúan del filtro para que Swagger abra en el navegador; las operaciones de pólizas, riesgos, mock CORE y las métricas siguen exigiendo la clave. En Swagger, pulsa **Authorize**, introduce `123456` y después **Try it out**.
 
 ## Configuración y observabilidad
 
