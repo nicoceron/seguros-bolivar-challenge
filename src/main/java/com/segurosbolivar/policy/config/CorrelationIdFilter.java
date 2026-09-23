@@ -1,3 +1,4 @@
+// Purpose of this file: Adds a tracking ID to each request and its log messages.
 package com.segurosbolivar.policy.config;
 
 import jakarta.servlet.FilterChain;
@@ -20,6 +21,7 @@ public class CorrelationIdFilter extends OncePerRequestFilter {
     public static final String CORRELATION_HEADER = "X-Correlation-ID";
 
     @Override
+    /** Accepts or creates a safe tracking ID, returns it, and adds it to logs for this request. */
     protected void doFilterInternal(
             HttpServletRequest request,
             HttpServletResponse response,

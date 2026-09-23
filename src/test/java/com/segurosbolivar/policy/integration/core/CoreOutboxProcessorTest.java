@@ -1,3 +1,4 @@
+// Purpose of this file: Checks delivery states, retries, and failures.
 package com.segurosbolivar.policy.integration.core;
 
 import com.segurosbolivar.policy.integration.outbox.CoreOutboxEvent;
@@ -29,6 +30,7 @@ class CoreOutboxProcessorTest {
     );
 
     @Test
+    /** Checks successful delivery becomes SENT. */
     void marksSuccessfulDeliveryAsSent() {
         CoreOutboxEvent event = new CoreOutboxEvent(42L);
         when(repository.findByIdForUpdate(event.getId())).thenReturn(Optional.of(event));
@@ -41,6 +43,7 @@ class CoreOutboxProcessorTest {
     }
 
     @Test
+    /** Checks a CORE failure schedules another attempt. */
     void schedulesRetryWhenCoreIsUnavailable() {
         CoreOutboxEvent event = new CoreOutboxEvent(42L);
         when(repository.findByIdForUpdate(event.getId())).thenReturn(Optional.of(event));
@@ -55,6 +58,7 @@ class CoreOutboxProcessorTest {
         assertThat(event.getLastError()).contains("CORE unavailable");
     }
     @Test
+    /** Checks a SENT event is not delivered again. */
     void alreadySentEventsAreNotPublishedAgain() {
         CoreOutboxEvent event = new CoreOutboxEvent(42L);
         when(repository.findByIdForUpdate(event.getId())).thenReturn(Optional.of(event));
@@ -64,6 +68,7 @@ class CoreOutboxProcessorTest {
     }
 
     @Test
+    /** Checks a worker waits until the next allowed retry time. */
     void respectsBackoffEvenWhenAnotherWorkerHasAStaleBatch() {
         CoreOutboxEvent event = new CoreOutboxEvent(42L);
         event.markFailed("Retry later", 5);
@@ -74,6 +79,7 @@ class CoreOutboxProcessorTest {
     }
 
     @Test
+    /** Checks exhausted events stay FAILED for inspection. */
     void exhaustedEventsAreRetainedAsFailedWithoutFurtherDelivery() {
         CoreOutboxEvent event = new CoreOutboxEvent(42L);
         for (int i = 0; i < 5; i++) { event.markFailed("CORE unavailable", 5); }

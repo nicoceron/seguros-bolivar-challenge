@@ -1,3 +1,4 @@
+// Purpose of this file: Regularly finds pending CORE events and asks the processor to handle them.
 package com.segurosbolivar.policy.integration.core;
 
 import com.segurosbolivar.policy.integration.outbox.OutboxStatus;
@@ -25,6 +26,7 @@ public class CoreOutboxDispatcher {
     private final CoreOutboxEventRepository repository;
     private final CoreOutboxProcessor processor;
 
+    /** Receives saved events and the processor that will deliver them. */
     public CoreOutboxDispatcher(
             CoreOutboxEventRepository repository,
             CoreOutboxProcessor processor
@@ -34,6 +36,7 @@ public class CoreOutboxDispatcher {
     }
 
     @Scheduled(fixedDelayString = "${app.core.dispatch-delay-ms}")
+    /** Processes due events one by one; one failure does not stop the batch. */
     public void dispatchPending() {
         for (UUID eventId : pendingEventIds()) {
             try {
@@ -45,6 +48,7 @@ public class CoreOutboxDispatcher {
         }
     }
 
+    /** Selects up to 50 pending events whose retry time has arrived. */
     private List<UUID> pendingEventIds() {
         return repository.findTop50ByStatusAndNextAttemptAtLessThanEqualOrderByCreatedAtAsc(
                         OutboxStatus.PENDING,

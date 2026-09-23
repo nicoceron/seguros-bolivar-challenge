@@ -1,3 +1,4 @@
+// Purpose of this file: Reads and locks saved CORE event reminders.
 package com.segurosbolivar.policy.repository;
 
 import com.segurosbolivar.policy.integration.outbox.CoreOutboxEvent;
@@ -17,8 +18,10 @@ public interface CoreOutboxEventRepository extends JpaRepository<CoreOutboxEvent
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select e from CoreOutboxEvent e where e.id = :id")
+    /** Locks one saved event so two workers do not send it together. */
     Optional<CoreOutboxEvent> findByIdForUpdate(@Param("id") UUID id);
 
+    /** Gets up to 50 due pending events, oldest first. */
     List<CoreOutboxEvent> findTop50ByStatusAndNextAttemptAtLessThanEqualOrderByCreatedAtAsc(
             OutboxStatus status,
             Instant now

@@ -1,3 +1,4 @@
+// Purpose of this file: Reads, saves, and locks policies in the database.
 package com.segurosbolivar.policy.repository;
 
 import com.segurosbolivar.policy.domain.Policy;
@@ -18,5 +19,6 @@ public interface PolicyRepository
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @QueryHints(@QueryHint(name = "jakarta.persistence.lock.timeout", value = "3000"))
     @Query("select p from Policy p where p.id = :id")
+    /** Reads and locks a policy so concurrent changes cannot overwrite each other. */
     Optional<Policy> findByIdForUpdate(@Param("id") long id);
 }

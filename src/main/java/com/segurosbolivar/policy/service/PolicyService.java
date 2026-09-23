@@ -1,3 +1,4 @@
+// Purpose of this file: Coordinates policy and risk operations inside database transactions.
 package com.segurosbolivar.policy.service;
 
 import com.segurosbolivar.policy.api.dto.CreatePolicyRequest;
@@ -32,6 +33,7 @@ public class PolicyService {
     private final RiskRepository riskRepository;
     private final CoreOutboxEventRepository outboxRepository;
 
+    /** Receives the three repositories used by the service. */
     public PolicyService(
             PolicyRepository policyRepository,
             RiskRepository riskRepository,
@@ -43,6 +45,7 @@ public class PolicyService {
     }
 
     @Transactional(readOnly = true)
+    /** Combines optional type and status filters and returns one page. */
     public PageResponse<PolicyResponse> findPolicies(
             PolicyType type,
             PolicyStatus status,
@@ -62,11 +65,13 @@ public class PolicyService {
     }
 
     @Transactional(readOnly = true)
+    /** Reads one policy and converts it to an API response. */
     public PolicyResponse getPolicy(long policyId) {
         return PolicyResponse.from(requirePolicy(policyId));
     }
 
     @Transactional(readOnly = true)
+    /** Checks the parent policy exists and returns all its risks. */
     public List<RiskResponse> getRisks(long policyId) {
         requirePolicy(policyId);
         return riskRepository.findByPolicyIdOrderByIdAsc(policyId)
@@ -76,6 +81,7 @@ public class PolicyService {
     }
 
     @Transactional
+    /** Validates an individual policy, saves it with risks, and queues a CORE event in one transaction. */
     public PolicyResponse createPolicy(CreatePolicyRequest request) {
         if (request.type() == PolicyType.INDIVIDUAL && request.risks().size() != 1) {
             throw new DomainRuleViolationException(
@@ -107,6 +113,7 @@ public class PolicyService {
     }
 
     @Transactional
+    /** Locks the policy, applies renewal, and saves a CORE reminder in the same transaction. */
     public PolicyResponse renew(long policyId, BigDecimal ipcPercentage) {
         Policy policy = requirePolicyForUpdate(policyId);
         policy.renew(ipcPercentage);
@@ -116,6 +123,7 @@ public class PolicyService {
     }
 
     @Transactional
+    /** Cancels policy and risks; repeating the call does not create another event. */
     public PolicyResponse cancelPolicy(long policyId) {
         Policy policy = requirePolicyForUpdate(policyId);
         if (policy.getStatus() != PolicyStatus.CANCELADA) {
@@ -127,6 +135,7 @@ public class PolicyService {
     }
 
     @Transactional
+    /** Allows only a noncancelled collective policy, adds the risk, and queues an event. */
     public RiskResponse addRisk(long policyId, RiskRequest request) {
         Policy policy = requirePolicyForUpdate(policyId);
         if (policy.getType() != PolicyType.COLECTIVA) {
@@ -143,6 +152,7 @@ public class PolicyService {
     }
 
     @Transactional
+    /** Locks the parent policy and cancels only the requested risk. */
     public RiskResponse cancelRisk(long riskId) {
         long policyId = riskRepository.findPolicyIdByRiskId(riskId)
                 .orElseThrow(() -> riskNotFound(riskId));
@@ -157,24 +167,29 @@ public class PolicyService {
     }
 
     @Transactional(readOnly = true)
+    /** Reads one risk and converts it to an API response. */
     public RiskResponse getRisk(long riskId) {
         return RiskResponse.from(requireRisk(riskId));
     }
 
+    /** Reads a risk or raises a 404 error. */
     private Risk requireRisk(long riskId) {
         return riskRepository.findById(riskId).orElseThrow(() -> riskNotFound(riskId));
     }
 
+    /** Builds a 404 error that includes the missing risk ID. */
     private ResourceNotFoundException riskNotFound(long riskId) {
         return new ResourceNotFoundException("RISK_NOT_FOUND", "Risk %d was not found".formatted(riskId));
     }
 
+    /** Reads and locks a policy for a change or raises 404. */
     private Policy requirePolicyForUpdate(long policyId) {
         return policyRepository.findByIdForUpdate(policyId)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "POLICY_NOT_FOUND", "Policy %d was not found".formatted(policyId)));
     }
 
+    /** Reads a policy or raises 404. */
     private Policy requirePolicy(long policyId) {
         return policyRepository.findById(policyId)
                 .orElseThrow(() -> new ResourceNotFoundException(
@@ -183,10 +198,12 @@ public class PolicyService {
                 ));
     }
 
+    /** Converts incoming address and tenant data into a Risk entity. */
     private Risk toRisk(RiskRequest request) {
         return new Risk(request.propertyAddress(), request.tenantName());
     }
 
+    /** Saves the durable reminder to notify CORE after the local transaction commits. */
     private void enqueueCoreUpdate(Long policyId) {
         outboxRepository.save(new CoreOutboxEvent(policyId));
     }

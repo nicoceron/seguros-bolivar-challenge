@@ -1,3 +1,4 @@
+// Purpose of this file: Checks rollback and concurrent updates across policy, risks, and outbox.
 package com.segurosbolivar.policy.service;
 
 import com.segurosbolivar.policy.api.dto.RiskRequest;
@@ -26,6 +27,7 @@ class PolicyTransactionTest {
     long id;
 
     @BeforeEach
+    /** Prepares test data or the local test server before each case. */
     void setUp() {
         tx.executeWithoutResult(status -> {
             outbox.deleteAllInBatch(); risks.deleteAllInBatch(); policies.deleteAllInBatch();
@@ -37,6 +39,7 @@ class PolicyTransactionTest {
     }
 
     @Test
+    /** Checks a failure rolls back policy, risks, and CORE event together. */
     void rollbackRestoresPolicyRisksAndOutboxTogether() {
         assertThatThrownBy(() -> tx.executeWithoutResult(status -> {
             service.cancelPolicy(id);
@@ -48,6 +51,7 @@ class PolicyTransactionTest {
     }
 
     @Test
+    /** Checks simultaneous add/cancel cannot leave an invalid active risk. */
     void cancellationAndConcurrentAdditionCannotLeaveAnActiveRisk() throws Exception {
         try (ExecutorService pool = Executors.newFixedThreadPool(2)) {
             CyclicBarrier start = new CyclicBarrier(2);
@@ -68,6 +72,7 @@ class PolicyTransactionTest {
     }
 
     @Test
+    /** Checks the response carries the saved version. */
     void committedResponsesContainTheCurrentVersion() {
         long before = service.getPolicy(id).version();
         var renewed = service.renew(id, new BigDecimal("5.2"));
@@ -77,6 +82,7 @@ class PolicyTransactionTest {
         assertThat(outbox.count()).isEqualTo(1);
     }
 
+    /** Waits until the two concurrent operations reach the same point. */
     private static void await(CyclicBarrier barrier) {
         try { barrier.await(5, TimeUnit.SECONDS); }
         catch (Exception exception) { throw new IllegalStateException(exception); }

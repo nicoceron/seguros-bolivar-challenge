@@ -10,6 +10,7 @@ from urllib.request import Request, urlopen
 
 
 def main() -> int:
+    """Run the live HTTP demo checks and return a shell-friendly exit code."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--base-url', default='http://localhost:8080')
     args = parser.parse_args()
@@ -18,6 +19,7 @@ def main() -> int:
     checks = 0
 
     def call(method, path, body=None, expected=200, authenticated=True):
+        """Send one request, check its status, and return the decoded JSON."""
         nonlocal checks
         headers = {'Content-Type': 'application/json'}
         if authenticated:
@@ -39,6 +41,7 @@ def main() -> int:
 
     risk = {'propertyAddress': 'Calle de prueba 1', 'tenantName': 'Ana'}
     def create(kind):
+        """Create a small policy of the requested type and return its new ID."""
         return call('POST', '/polizas', {
             'type': kind, 'effectiveFrom': '2026-01-01', 'durationMonths': 12,
             'monthlyRent': 100.01, 'policyholderName': 'Ana' if kind == 'INDIVIDUAL' else 'Inmobiliaria',

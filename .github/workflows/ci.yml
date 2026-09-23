@@ -1,3 +1,4 @@
+# Tests pushes and pull requests on the main development branches.
 name: CI
 
 on:
@@ -26,4 +27,3 @@ jobs:
 
       - name: Compile, test, and generate coverage report
         run: mvn --batch-mode --no-transfer-progress verify
-

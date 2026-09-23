@@ -2,6 +2,8 @@
 
 API de la prueba técnica: Java 21, Spring Boot 4.1.0, JPA, Flyway y capas controller/service/repository.
 
+**Plain-English guide to every file:** [CODE_MAP.md](CODE_MAP.md). Java files and methods also have English purpose comments.
+
 **Entrega:** [código en GitHub](https://github.com/nicoceron/seguros-bolivar-challenge/tree/assessment/final-2026-09-16) · [informe LaTeX, dos páginas](docs/technical-assessment.tex).
 
 ## Ejecutar

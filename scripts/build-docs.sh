@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Builds the two-page assessment PDF from its LaTeX source.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 mkdir -p docs/build output/pdf

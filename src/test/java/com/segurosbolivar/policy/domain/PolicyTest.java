@@ -1,3 +1,4 @@
+// Purpose of this file: Checks Policy business rules without HTTP.
 package com.segurosbolivar.policy.domain;
 
 import org.junit.jupiter.api.Test;
@@ -11,6 +12,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class PolicyTest {
 
     @Test
+    /** Checks an individual policy cannot take a second risk. */
     void individualPolicyRejectsASecondRisk() {
         Policy policy = policy(PolicyType.INDIVIDUAL);
         policy.addRisk(new Risk("Address 1", "Tenant 1"));
@@ -21,6 +23,7 @@ class PolicyTest {
     }
 
     @Test
+    /** Checks IPC math, premium, dates, and original duration. */
     void renewalAppliesIpcToRentAndPremiumAndKeepsTheInitialDuration() {
         Policy policy = policy(PolicyType.INDIVIDUAL);
 
@@ -34,6 +37,7 @@ class PolicyTest {
     }
 
     @Test
+    /** Checks a cancelled policy cannot be renewed. */
     void cancelledPolicyCannotBeRenewed() {
         Policy policy = policy(PolicyType.INDIVIDUAL);
         policy.cancel();
@@ -44,6 +48,7 @@ class PolicyTest {
     }
 
     @Test
+    /** Checks cancellation reaches all child risks. */
     void cancellationCascadesToEveryRisk() {
         Policy policy = policy(PolicyType.COLECTIVA);
         policy.addRisk(new Risk("Address 1", "Tenant 1"));
@@ -58,6 +63,7 @@ class PolicyTest {
     }
 
     @Test
+    /** Checks premium is calculated from already-rounded monthly rent. */
     void roundedRentRemainsTheSingleSourceOfTruthForPremium() {
         Policy policy = new Policy(PolicyType.INDIVIDUAL, LocalDate.of(2026, 1, 1),
                 12, new BigDecimal("100.01"), "Tenant", "Owner");
@@ -67,6 +73,7 @@ class PolicyTest {
     }
 
     @Test
+    /** Checks zero IPC keeps the price but advances coverage dates. */
     void zeroIpcStillOpensTheNextTerm() {
         Policy policy = policy(PolicyType.INDIVIDUAL);
         policy.renew(BigDecimal.ZERO);
@@ -76,6 +83,7 @@ class PolicyTest {
     }
 
     @Test
+    /** Checks Policy itself rejects an out-of-range IPC. */
     void invalidIpcCannotBypassTheDomainBoundary() {
         Policy policy = policy(PolicyType.INDIVIDUAL);
         for (BigDecimal invalid : new BigDecimal[]{null, new BigDecimal("-0.01"), new BigDecimal("100.01")}) {
@@ -85,6 +93,7 @@ class PolicyTest {
     }
 
     @Test
+    /** Checks calendar-month dates across a leap year. */
     void renewalUsesCalendarMonthsAcrossLeapYears() {
         Policy policy = new Policy(PolicyType.INDIVIDUAL, LocalDate.of(2024, 2, 29),
                 12, new BigDecimal("100.00"), "Tenant", "Owner");
@@ -94,6 +103,7 @@ class PolicyTest {
     }
 
     @Test
+    /** Checks an oversized amount leaves state unchanged. */
     void monetaryOverflowIsRejectedBeforeChangingState() {
         Policy policy = new Policy(PolicyType.INDIVIDUAL, LocalDate.of(2026, 1, 1),
                 1, new BigDecimal("99999999999999999.99"), "Tenant", "Owner");
@@ -103,6 +113,7 @@ class PolicyTest {
         assertThat(policy.getStatus()).isEqualTo(PolicyStatus.ACTIVA);
     }
 
+    /** Builds a small policy so each test can run independently. */
     private Policy policy(PolicyType type) {
         return new Policy(
                 type,

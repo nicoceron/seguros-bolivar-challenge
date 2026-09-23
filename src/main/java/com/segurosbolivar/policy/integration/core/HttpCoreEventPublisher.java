@@ -1,3 +1,4 @@
+// Purpose of this file: Sends an event to the CORE mock over HTTP.
 package com.segurosbolivar.policy.integration.core;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -14,6 +15,7 @@ public class HttpCoreEventPublisher implements CoreEventPublisher {
 
     private final RestClient restClient;
 
+    /** Sets the mock URL and HTTP connection and read timeouts. */
     public HttpCoreEventPublisher(
             RestClient.Builder restClientBuilder,
             @Value("${app.core.base-url}") String coreBaseUrl,
@@ -34,6 +36,7 @@ public class HttpCoreEventPublisher implements CoreEventPublisher {
     }
 
     @Override
+    /** POSTs the event and treats only an HTTP 2xx response as success. */
     public void publish(CoreEventPayload event) {
         var response = restClient.post()
                 .uri("/core-mock/evento")

@@ -1,3 +1,4 @@
+// Purpose of this file: Lists and validates the fields a client may send to create a policy.
 package com.segurosbolivar.policy.api.dto;
 
 import com.segurosbolivar.policy.domain.PolicyType;
@@ -15,6 +16,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
+/** Allowed policy-creation fields; annotations reject invalid values. */
 public record CreatePolicyRequest(
         @NotNull PolicyType type,
         @NotNull LocalDate effectiveFrom,

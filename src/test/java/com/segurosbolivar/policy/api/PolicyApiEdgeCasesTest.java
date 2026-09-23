@@ -1,3 +1,4 @@
+// Purpose of this file: Checks invalid input, security, missing IDs, and repeated cancellations over HTTP.
 package com.segurosbolivar.policy.api;
 
 import com.segurosbolivar.policy.domain.Policy;
@@ -36,6 +37,7 @@ class PolicyApiEdgeCasesTest {
     private static final String RISK = "{\"propertyAddress\":\"Calle 1\",\"tenantName\":\"Ana\"}";
 
     @BeforeEach
+    /** Prepares test data or the local test server before each case. */
     void setUp() {
         Policy p = new Policy(PolicyType.COLECTIVA, LocalDate.of(2026, 1, 1),
                 12, new BigDecimal("100.01"), "Inmobiliaria", "Propietario");
@@ -48,6 +50,7 @@ class PolicyApiEdgeCasesTest {
     @ParameterizedTest
     @ValueSource(strings = {"/polizas/1/renovar", "/polizas/1/cancelar", "/polizas/1/riesgos",
             "/riesgos/1/cancelar", "/core-mock/evento", "/polizas"})
+    /** Checks every data-changing route requires the key. */
     void everyMutationRejectsMissingKey(String path) throws Exception {
         mvc.perform(post(path).contentType(MediaType.APPLICATION_JSON).content("{}"))
                 .andExpect(status().isUnauthorized());
@@ -56,12 +59,14 @@ class PolicyApiEdgeCasesTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"", "wrong", "1234567"})
+    /** Checks incorrect keys return 401. */
     void incorrectKeysAreRejected(String key) throws Exception {
         mvc.perform(get("/polizas").header("x-api-key", key)).andExpect(status().isUnauthorized());
     }
 
     @ParameterizedTest
     @CsvSource({"size,0", "size,101", "page,-1", "tipo,UNKNOWN", "estado,UNKNOWN"})
+    /** Checks invalid filters and page settings return 400. */
     void invalidFiltersAndPaginationReturn400(String name, String value) throws Exception {
         mvc.perform(get("/polizas").header("x-api-key", "123456").param(name, value))
                 .andExpect(status().isBadRequest());
@@ -69,6 +74,7 @@ class PolicyApiEdgeCasesTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"{}", "{\"ipcPercentage\":-1}", "{\"ipcPercentage\":101}", "{broken"})
+    /** Checks invalid renewal does not queue a CORE event. */
     void invalidRenewalDoesNotWriteAnEvent(String body) throws Exception {
         mvc.perform(post("/polizas/{id}/renovar", policyId).header("x-api-key", "123456")
                         .contentType(MediaType.APPLICATION_JSON).content(body))
@@ -77,6 +83,7 @@ class PolicyApiEdgeCasesTest {
     }
 
     @Test
+    /** Checks missing IDs return 404. */
     void unknownResourcesReturn404() throws Exception {
         mvc.perform(get("/polizas/999999").header("x-api-key", "123456")).andExpect(status().isNotFound());
         mvc.perform(get("/polizas/999999/riesgos").header("x-api-key", "123456")).andExpect(status().isNotFound());
@@ -87,6 +94,7 @@ class PolicyApiEdgeCasesTest {
     }
 
     @Test
+    /** Checks repeated policy cancellation does not duplicate events. */
     void repeatedPolicyCancellationDoesNotDuplicateEvents() throws Exception {
         for (int i = 0; i < 2; i++) {
             mvc.perform(post("/polizas/{id}/cancelar", policyId).header("x-api-key", "123456"))
@@ -96,6 +104,7 @@ class PolicyApiEdgeCasesTest {
     }
 
     @Test
+    /** Checks repeated risk cancellation does not duplicate events. */
     void repeatedRiskCancellationDoesNotDuplicateEvents() throws Exception {
         for (int i = 0; i < 2; i++) {
             mvc.perform(post("/riesgos/{id}/cancelar", riskId).header("x-api-key", "123456"))
@@ -105,6 +114,7 @@ class PolicyApiEdgeCasesTest {
     }
 
     @Test
+    /** Checks a cancelled collective policy rejects a new risk. */
     void cannotAddARiskToACancelledCollective() throws Exception {
         mvc.perform(post("/polizas/{id}/cancelar", policyId).header("x-api-key", "123456"));
         mvc.perform(post("/polizas/{id}/riesgos", policyId).header("x-api-key", "123456")
@@ -114,6 +124,7 @@ class PolicyApiEdgeCasesTest {
     }
 
     @Test
+    /** Checks a created risk has an ID and a readable URL. */
     void createdRiskHasAnIdAndRetrievableLocation() throws Exception {
         String location = mvc.perform(post("/polizas/{id}/riesgos", policyId).header("x-api-key", "123456")
                         .contentType(MediaType.APPLICATION_JSON).content(RISK))
@@ -125,6 +136,7 @@ class PolicyApiEdgeCasesTest {
     }
 
     @Test
+    /** Checks both individual-policy creation rules. */
     void individualCreationEnforcesExactlyOneRiskAndTenantAsHolder() throws Exception {
         mvc.perform(post("/polizas").header("x-api-key", "123456").contentType(MediaType.APPLICATION_JSON)
                         .content(createBody("INDIVIDUAL", "Ana", "[" + RISK + "]")))
@@ -140,6 +152,7 @@ class PolicyApiEdgeCasesTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"[]", "[null]"})
+    /** Checks missing risks cause 400 rather than an internal 500. */
     void emptyOrNullRisksAreRejectedWithout500(String risks) throws Exception {
         mvc.perform(post("/polizas").header("x-api-key", "123456").contentType(MediaType.APPLICATION_JSON)
                         .content(createBody("COLECTIVA", "Agency", risks)))
@@ -148,6 +161,7 @@ class PolicyApiEdgeCasesTest {
     }
 
     @Test
+    /** Checks a safe tracking ID is returned to the client. */
     void correlationIdIsReturnedAndInvalidValuesAreReplaced() throws Exception {
         mvc.perform(get("/polizas").header("x-api-key", "123456").header("X-Correlation-ID", "test-123"))
                 .andExpect(header().string("X-Correlation-ID", "test-123"));
@@ -157,6 +171,7 @@ class PolicyApiEdgeCasesTest {
         assertThat(actual).matches("[0-9a-f-]{36}");
     }
 
+    /** Builds the policy creation JSON shared by several tests. */
     private String createBody(String type, String holder, String risks) {
         return """
                 {"type":"%s","effectiveFrom":"2026-01-01","durationMonths":12,

@@ -1,3 +1,4 @@
+// Purpose of this file: Receives HTTP requests to read or cancel one risk.
 package com.segurosbolivar.policy.api;
 
 import com.segurosbolivar.policy.api.dto.RiskResponse;
@@ -17,17 +18,20 @@ public class RiskController {
 
     private final PolicyService policyService;
 
+    /** Receives the service that can read and cancel risks. */
     public RiskController(PolicyService policyService) {
         this.policyService = policyService;
     }
 
     @GetMapping("/{id}")
+    /** Returns one risk by ID. */
     public RiskResponse get(@PathVariable long id) {
         return policyService.getRisk(id);
     }
 
     @PostMapping("/{id}/cancelar")
     @Operation(summary = "Cancel one risk")
+    /** Cancels one risk without cancelling its whole policy. */
     public RiskResponse cancel(@PathVariable long id) {
         return policyService.cancelRisk(id);
     }

@@ -1,3 +1,4 @@
+# Runs the API and PostgreSQL together for a local, repeatable demo.
 services:
   database:
     image: postgres:17-alpine

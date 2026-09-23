@@ -1,3 +1,4 @@
+// Purpose of this file: Checks HTTP payloads and responses with a local test server.
 package com.segurosbolivar.policy.integration.core;
 
 import com.sun.net.httpserver.HttpServer;
@@ -23,6 +24,7 @@ class HttpCoreEventPublisherTest {
     volatile int responseStatus = 202;
 
     @BeforeEach
+    /** Prepares test data or the local test server before each case. */
     void setUp() throws Exception {
         server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
         server.createContext("/core-mock/evento", exchange -> {
@@ -39,9 +41,11 @@ class HttpCoreEventPublisherTest {
     }
 
     @AfterEach
+    /** Stops the local test server and releases resources. */
     void tearDown() { server.stop(0); }
 
     @Test
+    /** Checks the required body and stable event ID over real HTTP. */
     void sendsRequiredPayloadAndStableIdOverRealHttp() {
         UUID id = UUID.randomUUID();
         publisher.publish(new CoreEventPayload("ACTUALIZACION", 555L, id));
@@ -51,6 +55,7 @@ class HttpCoreEventPublisherTest {
     }
 
     @Test
+    /** Checks an HTTP 5xx allows the outbox to retry. */
     void rejectsServerErrorsSoTheOutboxCanRetry() {
         responseStatus = 503;
         assertThatThrownBy(() -> publisher.publish(new CoreEventPayload("ACTUALIZACION", 555L, UUID.randomUUID())))
@@ -58,6 +63,7 @@ class HttpCoreEventPublisherTest {
     }
 
     @Test
+    /** Checks HTTP 302 is not treated as accepted delivery. */
     void redirectIsNotMistakenForAnAcknowledgement() {
         responseStatus = 302;
         assertThatThrownBy(() -> publisher.publish(new CoreEventPayload("ACTUALIZACION", 555L, UUID.randomUUID())))

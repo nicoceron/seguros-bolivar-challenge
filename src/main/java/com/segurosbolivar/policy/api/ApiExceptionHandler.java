@@ -1,3 +1,4 @@
+// Purpose of this file: Turns validation, business-rule, and concurrency errors into clear HTTP responses.
 package com.segurosbolivar.policy.api;
 
 import com.segurosbolivar.policy.domain.DomainRuleViolationException;
@@ -25,6 +26,7 @@ import java.util.Map;
 public class ApiExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
+    /** Returns HTTP 404 with a readable code when an ID does not exist. */
     ResponseEntity<ProblemDetail> notFound(
             ResourceNotFoundException exception,
             HttpServletRequest request
@@ -39,6 +41,7 @@ public class ApiExceptionHandler {
     }
 
     @ExceptionHandler(DomainRuleViolationException.class)
+    /** Returns HTTP 409 when a policy rule rejects an operation. */
     ResponseEntity<ProblemDetail> domainRule(
             DomainRuleViolationException exception,
             HttpServletRequest request
@@ -53,6 +56,7 @@ public class ApiExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
+    /** Collects invalid JSON fields and returns HTTP 400. */
     ResponseEntity<ProblemDetail> bodyValidation(
             MethodArgumentNotValidException exception,
             HttpServletRequest request
@@ -76,6 +80,7 @@ public class ApiExceptionHandler {
             IllegalArgumentException.class,
             DateTimeException.class
     })
+    /** Returns HTTP 400 when a request cannot be parsed or validated. */
     ResponseEntity<ProblemDetail> invalidRequest(
             Exception exception,
             HttpServletRequest request
@@ -90,6 +95,7 @@ public class ApiExceptionHandler {
     }
 
     @ExceptionHandler({OptimisticLockingFailureException.class, PessimisticLockingFailureException.class})
+    /** Returns HTTP 409 when another request changed or locked the record. */
     ResponseEntity<ProblemDetail> concurrentUpdate(
             RuntimeException exception,
             HttpServletRequest request
@@ -103,6 +109,7 @@ public class ApiExceptionHandler {
         );
     }
 
+    /** Builds the shared error body with code, request path, and time. */
     private ResponseEntity<ProblemDetail> problem(
             HttpStatus status,
             String code,

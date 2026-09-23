@@ -1,3 +1,4 @@
+// Purpose of this file: Receives policy HTTP requests and passes each operation to PolicyService.
 package com.segurosbolivar.policy.api;
 
 import com.segurosbolivar.policy.api.dto.CreatePolicyRequest;
@@ -38,12 +39,14 @@ public class PolicyController {
 
     private final PolicyService policyService;
 
+    /** Receives the service that performs the work; this class only handles HTTP. */
     public PolicyController(PolicyService policyService) {
         this.policyService = policyService;
     }
 
     @GetMapping
     @Operation(summary = "List policies, optionally filtered by tipo and estado")
+    /** Reads optional type and status filters and returns a page of policies. */
     public PageResponse<PolicyResponse> list(
             @RequestParam(required = false) PolicyType tipo,
             @RequestParam(required = false) PolicyStatus estado,
@@ -56,12 +59,14 @@ public class PolicyController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Retrieve one policy")
+    /** Returns one policy by ID. */
     public PolicyResponse get(@PathVariable long id) {
         return policyService.getPolicy(id);
     }
 
     @PostMapping
     @Operation(summary = "Create a policy and its initial risk set")
+    /** Creates a policy and returns 201 with the new resource URL. */
     public ResponseEntity<PolicyResponse> create(
             @Valid @RequestBody CreatePolicyRequest request,
             UriComponentsBuilder uriBuilder
@@ -73,12 +78,14 @@ public class PolicyController {
 
     @GetMapping("/{id}/riesgos")
     @Operation(summary = "List risks associated with a policy")
+    /** Lists a policy’s risks, including cancelled ones. */
     public List<RiskResponse> risks(@PathVariable long id) {
         return policyService.getRisks(id);
     }
 
     @PostMapping("/{id}/renovar")
     @Operation(summary = "Renew a policy using an IPC percentage")
+    /** Reads the IPC percentage and asks the service to renew the policy. */
     public PolicyResponse renew(
             @PathVariable long id,
             @Valid @RequestBody RenewPolicyRequest request
@@ -88,12 +95,14 @@ public class PolicyController {
 
     @PostMapping("/{id}/cancelar")
     @Operation(summary = "Cancel a policy and all its risks")
+    /** Asks the service to cancel a policy and all its risks. */
     public PolicyResponse cancel(@PathVariable long id) {
         return policyService.cancelPolicy(id);
     }
 
     @PostMapping("/{id}/riesgos")
     @Operation(summary = "Add a risk to a collective policy")
+    /** Adds a risk to a collective policy and returns 201. */
     public ResponseEntity<RiskResponse> addRisk(
             @PathVariable long id,
             @Valid @RequestBody RiskRequest request,

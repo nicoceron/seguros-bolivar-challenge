@@ -1,3 +1,4 @@
+// Purpose of this file: Pretends to be CORE: logs an HTTP event and returns 202 without changing a real CORE.
 package com.segurosbolivar.policy.api;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -27,6 +28,7 @@ public class CoreMockController {
 
     @PostMapping("/evento")
     @Operation(summary = "Log an attempted policy update delivery to CORE")
+    /** Logs a test event and returns 202; it does not update a real CORE. */
     public ResponseEntity<Void> event(@Valid @RequestBody CoreMockEventRequest request) {
         log.info(
                 "CORE update delivery attempted event={} policyId={} eventId={}",
@@ -37,6 +39,7 @@ public class CoreMockController {
         return ResponseEntity.accepted().build();
     }
 
+    /** JSON accepted by the CORE mock: event type, policy ID, and optional event ID. */
     public record CoreMockEventRequest(
             @NotBlank @Pattern(regexp = "ACTUALIZACION") @JsonProperty("evento") String event,
             @NotNull @Positive @JsonProperty("polizaId") Long policyId,

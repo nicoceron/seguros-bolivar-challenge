@@ -1,3 +1,4 @@
+// Purpose of this file: Creates two sample policies when the database is empty so the demo has data.
 package com.segurosbolivar.policy.config;
 
 import com.segurosbolivar.policy.domain.Policy;
@@ -24,12 +25,14 @@ public class DemoDataInitializer implements ApplicationRunner {
 
     private final PolicyRepository policyRepository;
 
+    /** Receives database access so sample policies can be inserted. */
     public DemoDataInitializer(PolicyRepository policyRepository) {
         this.policyRepository = policyRepository;
     }
 
     @Override
     @Transactional
+    /** At startup, inserts one individual and one collective policy only if none exist. */
     public void run(ApplicationArguments args) {
         if (policyRepository.count() > 0) {
             return;

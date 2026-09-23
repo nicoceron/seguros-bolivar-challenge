@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Tests the committed source, builds the PDF, and packages both as a ZIP.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 # Archive the tested source, never a stale HEAD while edits remain uncommitted.

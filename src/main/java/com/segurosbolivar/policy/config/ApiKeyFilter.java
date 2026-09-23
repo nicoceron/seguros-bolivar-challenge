@@ -1,3 +1,4 @@
+// Purpose of this file: Checks x-api-key before protected HTTP requests reach a controller.
 package com.segurosbolivar.policy.config;
 
 import jakarta.servlet.FilterChain;
@@ -28,6 +29,7 @@ public class ApiKeyFilter extends OncePerRequestFilter {
     private final byte[] expectedApiKey;
     private final ObjectMapper objectMapper;
 
+    /** Stores the expected key and JSON writer for unauthorized responses. */
     public ApiKeyFilter(
             @Value("${app.security.api-key}") String expectedApiKey,
             ObjectMapper objectMapper
@@ -37,6 +39,7 @@ public class ApiKeyFilter extends OncePerRequestFilter {
     }
 
     @Override
+    /** Compares the supplied key and stops the request with 401 if it is wrong or missing. */
     protected void doFilterInternal(
             HttpServletRequest request,
             HttpServletResponse response,
@@ -66,6 +69,7 @@ public class ApiKeyFilter extends OncePerRequestFilter {
     }
 
     @Override
+    /** Lets Docker check health without a key; also allows the error route. */
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
         return path.equals("/error")
