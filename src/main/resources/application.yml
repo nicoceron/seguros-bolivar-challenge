@@ -1,3 +1,4 @@
+# Default local settings: in-memory H2, API port, API key, CORE mock URL, and metrics.
 spring:
   application:
     name: policy-management-api

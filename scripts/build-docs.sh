@@ -1,22 +1,17 @@
 #!/usr/bin/env bash
+# Builds the two-page assessment PDF from its LaTeX source.
 set -euo pipefail
-
-script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-project_dir="$(cd "${script_dir}/.." && pwd)"
-build_dir="${project_dir}/docs/build"
-output_dir="${project_dir}/output/pdf"
-source_file="${project_dir}/docs/technical-assessment.tex"
-output_file="${output_dir}/Nicolas_Ceron_Prueba_Tecnica.pdf"
-
-mkdir -p "${build_dir}" "${output_dir}"
-
-tectonic \
-  --keep-logs \
-  --outdir "${build_dir}" \
-  "${source_file}"
-
-cp "${build_dir}/technical-assessment.pdf" "${output_file}"
-
-pdfinfo "${output_file}" | grep -E '^(Pages|Page size|Encrypted):'
-echo "Created ${output_file}"
-
+cd "$(dirname "$0")/.."
+mkdir -p docs/build output/pdf
+if command -v pdflatex >/dev/null 2>&1; then
+  for pass in 1 2; do
+    pdflatex -interaction=nonstopmode -halt-on-error -output-directory=docs/build docs/technical-assessment.tex
+  done
+elif command -v tectonic >/dev/null 2>&1; then
+  tectonic --outdir docs/build docs/technical-assessment.tex
+else
+  echo 'Install TeX Live (LaTeX, recommended fonts, Spanish, latex-extra) or Tectonic.' >&2
+  exit 1
+fi
+cp docs/build/technical-assessment.pdf output/pdf/Nicolas_Ceron_Prueba_Tecnica.pdf
+printf 'PDF: output/pdf/Nicolas_Ceron_Prueba_Tecnica.pdf\n'

@@ -1,3 +1,4 @@
+// Purpose of this file: Pretends to be CORE: logs an HTTP event and returns 202 without changing a real CORE.
 package com.segurosbolivar.policy.api;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -6,6 +7,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Positive;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +28,7 @@ public class CoreMockController {
 
     @PostMapping("/evento")
     @Operation(summary = "Log an attempted policy update delivery to CORE")
+    /** Logs a test event and returns 202; it does not update a real CORE. */
     public ResponseEntity<Void> event(@Valid @RequestBody CoreMockEventRequest request) {
         log.info(
                 "CORE update delivery attempted event={} policyId={} eventId={}",
@@ -35,9 +39,10 @@ public class CoreMockController {
         return ResponseEntity.accepted().build();
     }
 
+    /** JSON accepted by the CORE mock: event type, policy ID, and optional event ID. */
     public record CoreMockEventRequest(
-            @NotBlank @JsonProperty("evento") String event,
-            @NotNull @JsonProperty("polizaId") Long policyId,
+            @NotBlank @Pattern(regexp = "ACTUALIZACION") @JsonProperty("evento") String event,
+            @NotNull @Positive @JsonProperty("polizaId") Long policyId,
             @JsonProperty("eventId") UUID eventId
     ) {
     }

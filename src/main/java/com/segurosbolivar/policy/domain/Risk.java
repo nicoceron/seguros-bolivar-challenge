@@ -1,3 +1,4 @@
+// Purpose of this file: Stores a covered property and tenant, and supports cancellation.
 package com.segurosbolivar.policy.domain;
 
 import jakarta.persistence.Column;
@@ -50,24 +51,29 @@ public class Risk {
     @Column(nullable = false)
     private Instant updatedAt;
 
+    /** Empty constructor required by JPA when it reloads this saved entity. */
     protected Risk() {
     }
 
+    /** Validates the address and tenant and creates an active risk. */
     public Risk(String propertyAddress, String tenantName) {
         this.propertyAddress = requireText(propertyAddress, "Property address");
         this.tenantName = requireText(tenantName, "Tenant name");
         this.status = RiskStatus.ACTIVO;
     }
 
+    /** Links this risk to its parent policy before saving. */
     void attachTo(Policy policy) {
         this.policy = Objects.requireNonNull(policy, "Policy is required");
     }
 
+    /** Marks the risk cancelled without deleting its row. */
     public void cancel() {
         this.status = RiskStatus.CANCELADO;
     }
 
     @PrePersist
+    /** JPA fills timestamps when this risk is first saved. */
     void created() {
         Instant now = Instant.now();
         createdAt = now;
@@ -75,10 +81,12 @@ public class Risk {
     }
 
     @PreUpdate
+    /** JPA refreshes the update time when this risk changes. */
     void updated() {
         updatedAt = Instant.now();
     }
 
+    /** Requires nonblank text and removes surrounding spaces. */
     private static String requireText(String value, String field) {
         if (value == null || value.isBlank()) {
             throw new IllegalArgumentException(field + " is required");
@@ -86,34 +94,42 @@ public class Risk {
         return value.trim();
     }
 
+    /** Returns the unique record ID. */
     public Long getId() {
         return id;
     }
 
+    /** Returns this risk’s parent policy. */
     public Policy getPolicy() {
         return policy;
     }
 
+    /** Returns the covered property address. */
     public String getPropertyAddress() {
         return propertyAddress;
     }
 
+    /** Returns the covered tenant name. */
     public String getTenantName() {
         return tenantName;
     }
 
+    /** Returns the current record state. */
     public RiskStatus getStatus() {
         return status;
     }
 
+    /** Returns the JPA version used to detect stale writes. */
     public long getVersion() {
         return version;
     }
 
+    /** Returns when the row was created. */
     public Instant getCreatedAt() {
         return createdAt;
     }
 
+    /** Returns when the row was last updated. */
     public Instant getUpdatedAt() {
         return updatedAt;
     }

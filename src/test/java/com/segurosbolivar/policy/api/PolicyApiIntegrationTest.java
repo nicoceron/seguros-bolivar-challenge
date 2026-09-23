@@ -1,3 +1,4 @@
+// Purpose of this file: Checks the main HTTP requirements: listing, renewal, cancellation, risks, and CORE mock.
 package com.segurosbolivar.policy.api;
 
 import com.segurosbolivar.policy.domain.Policy;
@@ -48,6 +49,7 @@ class PolicyApiIntegrationTest {
     private Long collectiveRiskId;
 
     @BeforeEach
+    /** Prepares test data or the local test server before each case. */
     void setUp() {
         Policy individual = policy(PolicyType.INDIVIDUAL, "1000000.00");
         individual.addRisk(new Risk("Individual address", "Individual tenant"));
@@ -63,6 +65,7 @@ class PolicyApiIntegrationTest {
     }
 
     @Test
+    /** Checks the API rejects a request without the required key. */
     void requiresApiKey() throws Exception {
         mockMvc.perform(get("/polizas"))
                 .andExpect(status().isUnauthorized())
@@ -70,6 +73,7 @@ class PolicyApiIntegrationTest {
     }
 
     @Test
+    /** Checks type/status filters and paginated results. */
     void listsPoliciesUsingSpanishFiltersAndPagination() throws Exception {
         mockMvc.perform(get("/polizas")
                         .header("x-api-key", API_KEY)
@@ -83,6 +87,7 @@ class PolicyApiIntegrationTest {
     }
 
     @Test
+    /** Checks new rent, premium, status, and pending CORE event after renewal. */
     void renewsPolicyUsingIpcAndEnqueuesCoreUpdate() throws Exception {
         mockMvc.perform(post("/polizas/{id}/renovar", individualId)
                         .header("x-api-key", API_KEY)
@@ -99,6 +104,7 @@ class PolicyApiIntegrationTest {
     }
 
     @Test
+    /** Checks renewing a cancelled policy returns a conflict. */
     void cannotRenewACancelledPolicy() throws Exception {
         mockMvc.perform(post("/polizas/{id}/cancelar", individualId)
                         .header("x-api-key", API_KEY))
@@ -115,6 +121,7 @@ class PolicyApiIntegrationTest {
     }
 
     @Test
+    /** Checks cancelling a policy also cancels every risk. */
     void cancellingPolicyCancelsAllRisks() throws Exception {
         mockMvc.perform(post("/polizas/{id}/cancelar", collectiveId)
                         .header("x-api-key", API_KEY))
@@ -128,6 +135,7 @@ class PolicyApiIntegrationTest {
     }
 
     @Test
+    /** Checks collective policies accept new risks and individual ones reject them. */
     void addsRiskOnlyToCollectivePolicy() throws Exception {
         String risk = """
                 {
@@ -152,6 +160,7 @@ class PolicyApiIntegrationTest {
     }
 
     @Test
+    /** Checks cancelling one risk does not cancel the whole policy. */
     void cancelsOneRisk() throws Exception {
         mockMvc.perform(post("/riesgos/{id}/cancelar", collectiveRiskId)
                         .header("x-api-key", API_KEY))
@@ -160,6 +169,7 @@ class PolicyApiIntegrationTest {
     }
 
     @Test
+    /** Checks the mock accepts the required JSON and responds 202. */
     void coreMockAcceptsTheRequiredPayload() throws Exception {
         mockMvc.perform(post("/core-mock/evento")
                         .header("x-api-key", API_KEY)
@@ -173,6 +183,7 @@ class PolicyApiIntegrationTest {
                 .andExpect(status().isAccepted());
     }
 
+    /** Builds a small policy so each test can run independently. */
     private Policy policy(PolicyType type, String monthlyRent) {
         return new Policy(
                 type,

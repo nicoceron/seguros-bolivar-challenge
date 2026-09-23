@@ -1,485 +1,99 @@
-\documentclass[10pt,a4paper]{article}
-
-\usepackage[
-  top=1.55cm,
-  left=1.65cm,
-  right=1.65cm,
-  bottom=2.05cm,
-  headheight=21pt,
-  footskip=0.8cm
-]{geometry}
+\documentclass[11pt,a4paper]{article}
+\usepackage[top=1.65cm,bottom=1.7cm,left=1.8cm,right=1.8cm,headheight=14pt,footskip=20pt]{geometry}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
-\usepackage{lmodern}
-\usepackage{amssymb}
-\usepackage[table]{xcolor}
-\usepackage{microtype}
-\usepackage{graphicx}
-\usepackage{booktabs}
-\usepackage{tabularx}
-\usepackage{array}
-\usepackage{enumitem}
-\usepackage{listings}
-\usepackage{fancyhdr}
-\usepackage{titlesec}
-\usepackage{lastpage}
-\usepackage{hyperref}
-\usepackage{tikz}
-\usetikzlibrary{arrows.meta,positioning,shapes.geometric}
-
-\definecolor{BolivarGreen}{HTML}{006B3C}
-\definecolor{BolivarDark}{HTML}{12352B}
-\definecolor{BolivarYellow}{HTML}{F6C344}
-\definecolor{SoftGreen}{HTML}{E8F4EE}
-\definecolor{SoftGray}{HTML}{F2F4F3}
-\definecolor{MidGray}{HTML}{64706B}
-\definecolor{CodeBackground}{HTML}{F6F8F7}
-
-\hypersetup{
-  colorlinks=true,
-  linkcolor=BolivarGreen,
-  urlcolor=BolivarGreen,
-  pdftitle={Seguros Bolivar Full Stack Developer Technical Assessment},
-  pdfauthor={Nicolas Ceron}
-}
-
-\pagestyle{fancy}
-\fancyhf{}
-\lhead{\textcolor{BolivarGreen}{\textbf{Seguros Bolivar}}}
-\rhead{\textcolor{MidGray}{Technical Assessment}}
-\cfoot{\textcolor{MidGray}{Nicolas Ceron \textbar\ Page \thepage\ of \pageref{LastPage}}}
-\renewcommand{\headrulewidth}{0.4pt}
-\renewcommand{\headrule}{%
-  \hbox to\headwidth{\color{BolivarYellow}\leaders\hrule height \headrulewidth\hfill}}
-
-\titleformat{\section}
-  {\Large\bfseries\color{BolivarGreen}}
-  {\thesection}{0.65em}{}
-  [\vspace{-0.3em}\color{BolivarYellow}\titlerule]
-\titleformat{\subsection}
-  {\large\bfseries\color{BolivarDark}}
-  {\thesubsection}{0.55em}{}
-\titlespacing*{\section}{0pt}{1.0em}{0.55em}
-\titlespacing*{\subsection}{0pt}{0.8em}{0.35em}
-
-\setlist[itemize]{leftmargin=1.45em,itemsep=0.12em,topsep=0.2em}
-\setlist[enumerate]{leftmargin=1.65em,itemsep=0.15em,topsep=0.2em}
-\renewcommand{\arraystretch}{1.13}
+\usepackage[spanish]{babel}
+\usepackage{lmodern,microtype,amsmath,xcolor,enumitem,titlesec,fancyhdr,hyperref}
+\definecolor{ink}{HTML}{173F35}
+\definecolor{muted}{HTML}{56645E}
+\hypersetup{colorlinks=true,urlcolor=ink,linkcolor=ink,pdftitle={Prueba tecnica - Gestion de polizas},pdfauthor={Nicolas Ceron}}
 \setlength{\parindent}{0pt}
-\setlength{\parskip}{0.32em}
-\setlength{\emergencystretch}{3em}
-
-\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
-\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
-\newcommand{\repo}{%
-  \href{https://github.com/nicoceron/seguros-bolivar-challenge}%
-  {github.com/nicoceron/seguros-bolivar-challenge}}
-
-\lstdefinestyle{assessment}{
-  backgroundcolor=\color{CodeBackground},
-  basicstyle=\ttfamily\footnotesize,
-  keywordstyle=\color{BolivarGreen}\bfseries,
-  frame=single,
-  rulecolor=\color{SoftGray},
-  breaklines=true,
-  showstringspaces=false,
-  columns=fullflexible,
-  keepspaces=true,
-  xleftmargin=0.3em,
-  xrightmargin=0.3em,
-  aboveskip=0.35em,
-  belowskip=0.35em
-}
-\lstset{style=assessment,literate={é}{{\'e}}1}
-
-\tikzset{
-  component/.style={
-    draw=BolivarGreen,
-    thick,
-    rounded corners=2pt,
-    fill=SoftGreen,
-    align=center,
-    minimum width=2.0cm,
-    minimum height=0.72cm,
-    font=\footnotesize
-  },
-  external/.style={
-    draw=BolivarDark,
-    thick,
-    rounded corners=2pt,
-    fill=SoftGray,
-    align=center,
-    minimum width=2.0cm,
-    minimum height=0.72cm,
-    font=\footnotesize
-  },
-  store/.style={
-    cylinder,
-    shape border rotate=90,
-    aspect=0.25,
-    draw=BolivarGreen,
-    thick,
-    fill=BolivarYellow!20,
-    align=center,
-    minimum width=2.0cm,
-    minimum height=0.82cm,
-    font=\footnotesize
-  },
-  flow/.style={-{Latex[length=2.1mm]},thick,draw=BolivarDark},
-  event/.style={-{Latex[length=2.1mm]},thick,dashed,draw=BolivarGreen}
-}
-
+\setlength{\parskip}{4pt}
+\setlength{\emergencystretch}{2em}
+\titleformat{\section}{\large\bfseries\color{ink}}{}{0pt}{}
+\titlespacing*{\section}{0pt}{9pt}{4pt}
+\setlist[enumerate]{leftmargin=1.5em,itemsep=2pt,topsep=3pt,parsep=0pt}
+\pagestyle{fancy}\fancyhf{}
+\fancyfoot[L]{\small\color{muted}Nicolas Ceron \;|\; Seguros Bolívar}
+\fancyfoot[R]{\small\color{muted}\thepage\,/\,2}
+\renewcommand{\headrulewidth}{0pt}
+\newcommand{\tagline}[1]{\textbf{#1}\enspace}
 \begin{document}
+{\LARGE\bfseries\color{ink}Gestión de pólizas}\hfill{\small 16 septiembre 2026}\\[4pt]
+{\large Prueba técnica \; / \; decisiones y entrega}\par
+\href{https://github.com/nicoceron/seguros-bolivar-challenge/tree/assessment/final-2026-09-16}{\small GitHub: nicoceron/seguros-bolivar-challenge · rama assessment/final-2026-09-16}
+\vspace{3pt}\hrule\vspace{3pt}
 
-\begin{center}
-  {\color{BolivarGreen}\LARGE\bfseries Full Stack Developer Technical Assessment}\\[0.25em]
-  {\large Policy Management Platform}\\[0.65em]
-  \begin{tabular}{@{}rl@{}}
-    \textbf{Candidate:} & Nicolas Ceron \\
-    \textbf{Date:} & July 29, 2026 \\
-    \textbf{Repository:} & \repo \\
-  \end{tabular}
+\section{1. Diseño del sistema}
+\tagline{Tres patrones.} \textbf{Monolito modular}: pólizas y riesgos comparten transacción; evita coordinación distribuida innecesaria. \textbf{Hexagonal}: un puerto aísla el dominio del HTTP y de WebLogic. \textbf{Eventos con outbox}: cambio y envío pendiente se guardan juntos; una caída del CORE no pierde la intención de actualización.
+
+\begin{center}\small\ttfamily
+Cliente -> API Gateway -> Pólizas / Riesgos\\
+\hspace*{5em}-> Base de datos + outbox\\
+Outbox -> Adapter CORE -> WebLogic -> CORE legado\\
+Outbox -> Broker -> Notificaciones -> Correo / SMS
 \end{center}
+{\small\color{muted}Implementado: API, base de datos, outbox y adapter al mock. Gateway, broker, notificaciones y WebLogic real pertenecen al diseño objetivo.}
 
-\section{Module 1 - System Design}
+\tagline{Modelo.} Póliza: tipo, estado, vigencia, meses iniciales, canon, prima, tomador y versión. Riesgo: póliza, inmueble, arrendatario y estado; relación 1:1 individual y 1:N colectiva. En producción, terceros con identidad y roles: individual, tomador = asegurado = arrendatario; colectiva, tomador = inmobiliaria/administración y beneficiario = arrendador por riesgo. La demo simplifica personas a nombres y un beneficiario por póliza.
 
-\subsection{Domain}
+\tagline{Operación objetivo.} Réplicas sin sesión; base de datos multi-zona, copias y restauración ensayada. Logs con correlación, sin claves ni datos personales; métricas de errores, latencia p95 y antigüedad del outbox. API pública \texttt{/v1}, contratos compatibles y migraciones graduales; la prueba conserva las rutas exigidas. Un planificador renovaría vencimientos con IPC registrado y unicidad póliza--vigencia, reutilizando el caso de uso. Creación y renovación publicarían eventos para notificar sin bloquear la API.
 
-\begin{itemize}
-  \item \textbf{INDIVIDUAL}: the tenant is policyholder and insured; the landlord is
-  beneficiary; the policy has exactly one risk.
-  \item \textbf{COLECTIVA}: a real-estate agency or co-property administration is the
-  policyholder; tenants are insured and landlords are beneficiaries; the policy has one
-  or more risks.
-  \item Each policy has an effective period, monthly rent, and premium. Premium is
-  \(\textit{monthly rent} \times \textit{term months}\).
-  \item Renewal uses the original term duration, applies IPC to monthly rent and premium,
-  and changes the status to \texttt{RENOVADA}.
-  \item The platform creates, retrieves, and modifies both policy types. Collective
-  policies allow risks to be added or cancelled. Creation and renewal produce email/SMS
-  notification events.
-\end{itemize}
+\section{2. Implementación y decisiones}
+Java 21, Spring Boot, capas controller/service/repository, JPA y Flyway. Los seis endpoints exigidos y \texttt{/core-mock/evento} están implementados; crear y consultar por ID permiten probar sin depender del front. H2 facilita ejecución local; hay perfil PostgreSQL y Docker Compose.
 
-\subsection{Questions 1 and 5 - What is the high-level architecture and component diagram?}
+\tagline{Reglas.} Individual: exactamente un riesgo al crear; agregar exige colectiva. Cancelar es baja lógica en cascada y repetirla no genera otro evento. Las mutaciones bloquean la póliza para evitar carreras entre agregar y cancelar. Renovar una cancelada devuelve 409; la nueva vigencia conserva los meses originales.
+\[
+ C'=\operatorname{redondear}_{2}\!\left(C(1+IPC/100)\right),\qquad P'=C'\,m.
+\]
+Se usa \texttt{BigDecimal}/\texttt{HALF\_UP}; derivar la prima del canon redondeado evita diferencias de centavos. IPC entra como porcentaje; sus límites y los demás supuestos están en README.
 
-\textit{Design the system's high-level architecture and diagram the Policy, Risk,
-Notification, CORE Integration Adapter, database, and API Gateway components.}
+\tagline{CORE y seguridad.} Cada cambio confirma datos + outbox; el worker llama por HTTP al mock con \texttt{x-api-key: 123456}. Aplica timeouts, hasta cinco intentos y UUID estable. Un éxito de la API \emph{no} confirma el CORE. Los fallidos se conservan; producción requiere deduplicación, orden por póliza y conciliación. El mock solo registra el intento, no modifica un CORE real.
 
-\begin{figure}[ht]
-\centering
-\resizebox{\textwidth}{!}{
-\begin{tikzpicture}[node distance=0.65cm and 0.8cm]
-  \node[external] (client) {Web / Mobile};
-  \node[component,right=of client] (gateway) {API Gateway};
-  \node[component,right=of gateway,yshift=0.75cm] (policy) {Policy Service};
-  \node[component,right=of gateway,yshift=-0.75cm] (risk) {Risk Service};
-  \node[store,right=1.0cm of policy,yshift=-0.75cm] (db) {Policy DB\\+ outbox};
-  \node[component,right=1.0cm of db,yshift=0.75cm] (notification) {Notification\\Service};
-  \node[component,right=1.0cm of db,yshift=-0.75cm] (adapter) {CORE Integration\\Adapter};
-  \node[external,right=of notification] (channels) {Email / SMS};
-  \node[external,right=of adapter] (weblogic) {WebLogic\\Edit Service};
-  \node[external,right=of weblogic] (core) {Legacy CORE};
+{\small\textbf{Verificación:} 55 pruebas aprobadas con \texttt{mvn verify}; ejecución: \texttt{mvn spring-boot:run}. Pruebas de reglas, API, rollback, concurrencia y HTTP del adapter. Renovación automática y notificaciones son diseño, no funcionalidades entregadas.}
 
-  \draw[flow] (client) -- (gateway);
-  \draw[flow] (gateway) -- (policy);
-  \draw[flow] (gateway) -- (risk);
-  \draw[flow] (policy) -- (db);
-  \draw[flow] (risk) -- (db);
-  \draw[event] (db) -- (notification);
-  \draw[flow] (notification) -- (channels);
-  \draw[event] (db) -- (adapter);
-  \draw[flow] (adapter) -- (weblogic);
-  \draw[flow] (weblogic) -- (core);
-\end{tikzpicture}
-}
-\caption{Required component view. Dashed arrows are asynchronous outbox deliveries.}
-\end{figure}
+\newpage
+\section{3. Base de datos: tres estrategias}
+\begin{enumerate}
+\item \textbf{Índices:} evaluar \texttt{customers(country, customer\_id)} y \texttt{orders(customer\_id)}. Reducen búsquedas cuando México es selectivo; si abarca muchas filas, un \emph{hash join} con lectura completa puede ser preferible.
+\item \textbf{Estadísticas y plan real:} actualizar con \texttt{DBMS\_STATS}; revisar sesgo de \texttt{country} e histogramas. Con estadísticas de ejecución habilitadas, usar \texttt{DBMS\_XPLAN.DISPLAY\_CURSOR} y \texttt{ALLSTATS LAST}; comparar filas estimadas/reales, lecturas y tiempo antes/después, sin imponer hints a ciegas.
+\item \textbf{Materializar la consulta frecuente:} una vista materializada del resultado evita repetir la unión. Acordar frescura y coste de refresco; el refresco rápido depende de los requisitos de Oracle. Particionar por fecha no resuelve por sí solo esta consulta sin filtro temporal.
+\end{enumerate}
+No se suministraron datos ni plan de ejecución: estas son estrategias a medir, no mejoras cuantificadas.
 
-Policy and Risk are logical modules in one Spring Boot deployment. This keeps policy/risk
-changes transactional while preserving clear boundaries. Stateless instances run behind
-the API Gateway. Every policy or risk state change updates the database and stores a CORE
-outbox event in one transaction. A worker then calls the agnostic WebLogic edit service,
-so a temporary CORE outage does not reject an otherwise valid platform operation.
+\section{4. Git: traer únicamente el arreglo de seguridad}
+Con el árbol de trabajo limpio, inspeccionar el commit que contiene el arreglo:
+\begin{quote}\small\ttfamily
+ git fetch origin\\
+ git switch feature/new-login\\
+ git show <SHA-del-arreglo>\\
+ git cherry-pick -x <SHA-del-arreglo>
+\end{quote}
+\texttt{cherry-pick} aplica ese cambio, no el resto de \texttt{main}; \texttt{-x} conserva trazabilidad. Resolver conflictos, ejecutar pruebas, hacer \texttt{git add} de los archivos resueltos y \texttt{git cherry-pick --continue}; para desistir, \texttt{--abort}. Verificar dependencias del arreglo y elegir su commit, no un merge sin revisar sus padres.
 
-Rule-based automatic renewal is executed by a scheduled worker that selects eligible
-policies and invokes the same renewal use case as the API. Creation and renewal events
-are consumed by the Notification Service for email and SMS delivery.
+\section{5. Liderazgo técnico}
+\tagline{Cinco prioridades, primeras dos semanas.}
+\begin{enumerate}
+\item Días 1--2: clasificar los diez incidentes, contener los repetidos y asignar responsables con plan de reversión.
+\item Días 1--3: acordar un alcance mínimo para la entrega de tres semanas, criterios de aceptación y riesgos visibles.
+\item Semana 1: exigir revisión y CI; cubrir con pruebas los flujos que causaron incidentes antes de cambiarlos.
+\item Semanas 1--2: priorizar deuda por impacto en fallos y entrega, no intentar eliminar todo el 40\% a la vez.
+\item Desde el día 1: emparejar a cada junior con alguien experimentado, con tareas pequeñas y revisión diaria.
+\end{enumerate}
 
-\subsection{Question 2 - Which three architectural patterns would you select, and why?}
+\tagline{Organización de ocho personas.} Dos enfocadas en estabilidad y seis en la funcionalidad, incluidos los dos juniors acompañados. Rotar atención de incidentes, limitar trabajo en curso y mantener un único backlog priorizado. Revisar la distribución semanalmente según incidentes y avance.
 
-\begin{tabularx}{\textwidth}{@{}L{3.0cm}Y@{}}
-\toprule
-\rowcolor{SoftGreen}
-\textbf{Pattern} & \textbf{Justification} \\
-\midrule
-\textbf{1. Modular monolith} &
-Policy and Risk share transactional rules. One deployable avoids distributed
-transactions and unnecessary operational complexity while module interfaces preserve
-an extraction path. \\
-\textbf{2. Hexagonal architecture} &
-Domain rules depend on ports rather than HTTP, JPA, WebLogic, or notification providers.
-The CORE and persistence adapters can therefore be replaced and tested independently. \\
-\textbf{3. Event-driven integration with transactional outbox} &
-Policy changes and delivery intent commit atomically. CORE and notification delivery can
-retry asynchronously with stable event identifiers, protecting availability and
-preventing lost updates. \\
-\bottomrule
-\end{tabularx}
+\tagline{Métricas.} Línea base y revisión semanal: frecuencia de despliegue, tiempo desde cambio hasta producción, porcentaje de cambios fallidos y tiempo de recuperación. Complementar con incidentes repetidos, cumplimiento del objetivo de servicio y espera de revisión. No usar líneas de código como productividad individual.
 
-\subsection{Question 3 - What is the main data model?}
+\tagline{Prácticas obligatorias.} PR aprobado, CI verde, pruebas de reglas e integración, análisis de seguridad y secretos, migraciones compatibles, logs útiles y rollback probado. Toda corrección de incidente incluye una prueba de regresión.
 
-\textit{Describe the principal data model without detailed SQL.}
+\tagline{Presión del negocio.} Demostrar avances semanalmente y negociar alcance, no retirar validaciones. Entregar en incrementos detrás de banderas de funcionalidad; semana 3, despliegue gradual. Comunicar opciones y consecuencias; un riesgo crítico sin mitigación bloquea la salida.
 
-\textbf{Policy} stores identity, type, status, effective dates, original duration,
-monthly rent, premium, policyholder, beneficiary, and optimistic version.
-\textbf{Risk} stores identity, policy ID, property address, tenant, status, and version.
-\textbf{CoreOutboxEvent} stores event ID, policy ID, event type, delivery status,
-attempts, next attempt, and last error. Policy has one-to-many relationships with Risk
-and CoreOutboxEvent. Monetary values use fixed decimal precision.
-
-An individual policy is validated to have exactly one risk; a collective policy has one
-or more. A cancelled policy cannot renew. Cancelling a policy cancels every risk in the
-same transaction.
-
-\subsection{Question 4 - How would you handle the required operational concerns?}
-
-\textit{Explain scalability, logs and observability, fault tolerance, and API versioning.}
-
-\begin{tabularx}{\textwidth}{@{}L{3.0cm}Y@{}}
-\toprule
-\rowcolor{SoftGreen}
-\textbf{Concern} & \textbf{Approach} \\
-\midrule
-Scalability &
-Stateless API instances scale horizontally. Lists are paginated; indexes support policy
-\texttt{(type,status)} and risk \texttt{(policy\_id)} queries. Renewal and outbox workers
-process bounded batches. \\
-Logs and observability &
-Structured logs include correlation ID, route, duration, policy/event ID, and outcome.
-Health, request latency/error metrics, CORE failures, retries, and outbox age are
-monitored. Secrets and personal data are not logged. \\
-Fault tolerance &
-Database transactions, optimistic locking, timeouts, bounded retry with backoff,
-idempotent event IDs, dead-letter handling, multi-instance deployment, and tested
-database backups. \\
-API versioning &
-Expose major versions in the public path, for example \texttt{/api/v1}. Additive changes
-remain compatible; breaking changes receive a new version with a published deprecation
-period. The assessment routes remain unprefixed exactly as requested. \\
-\bottomrule
-\end{tabularx}
-
-\section{Module 2 - Practical API}
-
-\textbf{Assessment task.} Implement only the essential policy-management API: the seven
-specified endpoints, four business rules, CORE mock, mandatory API-key header, Spring
-Boot layers, basic Policy/Risk entities, functional validations, and README instructions.
-
-\textbf{Source code:} \repo
-
-\subsection{Implementation}
-
-The solution uses Java 21 and Spring Boot with controller, service, repository, domain,
-and integration layers. JPA entities model \texttt{Poliza} and \texttt{Riesgo}; Flyway
-creates the schema; H2 supports local execution and PostgreSQL is configured for
-production. Every protected route requires:
-
-\begin{lstlisting}
-x-api-key: 123456
-\end{lstlisting}
-
-{\small
-\begin{tabularx}{\textwidth}{@{}L{4.8cm}Y@{}}
-\toprule
-\rowcolor{SoftGreen}
-\textbf{Mandatory endpoint} & \textbf{Implemented behavior} \\
-\midrule
-\texttt{GET /polizas} &
-Paginated list filtered by optional \texttt{tipo} and \texttt{estado}. \\
-\texttt{GET /polizas/\{id\}/riesgos} &
-Returns all risks for the policy. \\
-\texttt{POST /polizas/\{id\}/renovar} &
-Validates IPC and current status, adjusts rent and premium, preserves the original term,
-and sets \texttt{RENOVADA}. \\
-\texttt{POST /polizas/\{id\}/cancelar} &
-Sets the policy to \texttt{CANCELADA} and cancels all associated risks. \\
-\texttt{POST /polizas/\{id\}/riesgos} &
-Adds a risk only when the policy is \texttt{COLECTIVA}. \\
-\texttt{POST /riesgos/\{id\}/cancelar} &
-Cancels the selected risk. \\
-\texttt{POST /core-mock/evento} &
-Accepts \texttt{\{"evento":"ACTUALIZACION","polizaId":555\}} and logs the attempted
-CORE delivery. \\
-\bottomrule
-\end{tabularx}
-}
-
-The domain rejects a second risk on an individual policy, renewal of a cancelled policy,
-and risk creation for a non-collective policy. Each state-changing operation also
-creates a transactional CORE outbox event. Validation errors use consistent HTTP problem
-responses. The repository includes README instructions, OpenAPI documentation, Docker
-Compose, health/metrics endpoints, and CI.
-
-\subsection{Execution and verification}
-
-\begin{lstlisting}[language=bash]
-mvn spring-boot:run
-
-curl -H 'x-api-key: 123456' \
-  'http://localhost:8080/polizas?tipo=INDIVIDUAL&estado=ACTIVA'
-
-mvn verify
-\end{lstlisting}
-
-The final release passes 14 automated domain and API tests. Full request examples are in
-the repository README.
-
-\clearpage
-\section{Module 3 - Database Optimization}
-
-\textbf{Question.} Given approximately 10 million orders, 500,000 customers, and the
-following slow query for customers from Mexico, describe at least three different
-optimization strategies.
-
-\textbf{Answer.} I would first capture the actual plan with
-\texttt{EXPLAIN ANALYZE} and measure row estimates, logical reads, join method, spills,
-and elapsed time.
-
-\begin{lstlisting}[language=SQL]
-SELECT o.order_id, o.order_date, c.customer_name, o.total_amount
-FROM orders o
-JOIN customers c ON o.customer_id = c.customer_id
-WHERE c.country = 'México';
-\end{lstlisting}
-
-\textbf{Strategy 1 - Index the filter and join keys.}
-
-\begin{lstlisting}[language=SQL]
-CREATE INDEX idx_customers_country_customer
-  ON customers(country, customer_id);
-
-CREATE INDEX idx_orders_customer
-  ON orders(customer_id);
-\end{lstlisting}
-
-The first index finds the relevant customer IDs; the second avoids scanning all orders
-during the join. If supported and justified by the measured workload, include projected
-columns to reduce table lookups. The added storage and write cost must be monitored.
-
-\textbf{Strategy 2 - Correct statistics and validate the execution plan.}
-
-Refresh statistics and create a histogram for the potentially skewed
-\texttt{customers.country} column. Verify that the optimizer starts with filtered
-customers and chooses an indexed nested-loop join when the filter is selective, or a
-hash join when it is not. Also correct implicit type/collation conversions and memory
-shortages that cause hash or sort spills.
-
-\textbf{Strategy 3 - Use a materialized reporting model for frequent reads.}
-
-If this is a frequent report and slight staleness is acceptable, create a materialized
-view containing the joined projection and index it by country. Refresh it incrementally
-or from change-data capture. This moves repeated join cost away from the transactional
-tables; the trade-off is refresh complexity and controlled data staleness.
-
-\section{Module 4 - Git}
-
-\textbf{Question.} While working on \texttt{feature/new-login}, a critical security fix
-is merged into \texttt{main}. How would you incorporate only that specific change without
-bringing the other updates from \texttt{main}, and why?
-
-\textbf{Answer.} Use \texttt{cherry-pick}:
-
-\begin{lstlisting}[language=bash]
-git fetch origin
-git switch feature/new-login
-git cherry-pick -x <security-fix-commit-sha>
-\end{lstlisting}
-
-\texttt{git cherry-pick} applies only the selected commit rather than all changes from
-\texttt{main}. The \texttt{-x} option records the original commit SHA for traceability.
-If conflicts occur, resolve them, run the tests, and use
-\texttt{git cherry-pick --continue}; use \texttt{git cherry-pick --abort} if the change
-cannot be safely resolved.
-
-\clearpage
-\section{Module 5 - Technical Leadership}
-
-The team has eight developers, 40\% technical debt in key services, ten critical
-incidents in the last month, a three-week feature deadline, inconsistent reviews and
-standards, and two junior developers who need support.
-
-\subsection{Question 1 - What are your five priorities in the first two weeks?}
-
-\begin{tabularx}{\textwidth}{@{}L{0.55cm}L{3.4cm}Y@{}}
-\toprule
-\rowcolor{SoftGreen}
-\textbf{\#} & \textbf{Priority} & \textbf{Actions} \\
-\midrule
-1 & Stabilize critical services &
-Review the ten incidents, fix the main recurring causes, assign service owners, and
-establish on-call, actionable alerts, and runbooks. \\
-2 & Agree on a safe three-week scope &
-Define the smallest valuable vertical slice with explicit acceptance, security,
-observability, and rollback criteria. Surface dependencies and risks to the business. \\
-3 & Establish minimum standards &
-Introduce a Definition of Done, protected main branch, CI, small pull requests, mandatory
-review, and clear ownership. \\
-4 & Prioritize technical debt by risk &
-Rank debt by incident recurrence, security, and impact on the feature path. Schedule the
-highest-risk items rather than attempting to remove an arbitrary percentage. \\
-5 & Develop team capability &
-Pair each junior with a senior, give them bounded production tasks and weekly learning
-goals, and share incident and architecture knowledge across the team. \\
-\bottomrule
-\end{tabularx}
-
-\subsection{Question 2 - How would you organize the team to improve speed and quality?}
-
-Create two four-person pods: a \textbf{feature pod} responsible for the thin vertical
-slice and a \textbf{reliability pod} responsible for recurring incidents, delivery
-guardrails, and critical-path debt. Place one junior in each pod with a designated
-mentor. Rotate an incident captain from the team so other developers retain focus.
-Use one prioritized board, limited work in progress, daily risk coordination, small
-changes, and shared primary/secondary ownership.
-
-\subsection{Question 3 - Which metrics would you use to evaluate area performance?}
-
-\begin{itemize}
-  \item \textbf{Reliability:} SLO attainment, critical incident count and recurrence,
-  mean time to detect, and mean time to restore.
-  \item \textbf{Delivery:} deployment frequency, lead time, cycle time, blocked time,
-  and work-in-progress age.
-  \item \textbf{Quality:} change failure/rollback rate, escaped defects, flaky tests,
-  critical vulnerabilities, and review time.
-  \item \textbf{Sustainability and outcome:} unplanned work, on-call load, knowledge
-  coverage, feature adoption, and task success.
-\end{itemize}
-
-Metrics are evaluated as team and service trends, not as individual rankings.
-
-\subsection{Question 4 - Which technical practices would you make mandatory?}
-
-\begin{itemize}
-  \item Protected main branch, CI checks, dependency/security scanning, and no direct
-  production changes.
-  \item At least one meaningful reviewer; code-owner or second review for critical and
-  security changes.
-  \item Automated tests appropriate to the risk, plus observability and rollback
-  evidence in the Definition of Done.
-  \item Short-lived branches, small pull requests, feature flags, and progressive
-  delivery.
-  \item Blameless incident reviews with owned corrective actions, service runbooks, and
-  architecture decisions recorded for material changes.
-\end{itemize}
-
-\subsection{Question 5 - How would you manage business pressure without sacrificing quality?}
-
-Quality floors for security, data correctness, testing, observability, and rollback do
-not move; scope does. I would present three explicit options: a safe thin slice in three
-weeks, broader scope at a later date, or a controlled three-week beta for limited users.
-The recommended option is the thin slice, demonstrated twice weekly and released behind
-a feature flag with monitored rollout and stop conditions. If the requested date, scope,
-and quality cannot all be maintained, document the trade-off, recommend an option, and
-ask the accountable business owner to make the decision with the risk visible.
-
+\vfill
+{\footnotesize\color{muted}\textbf{Base:} enunciado suministrado, módulos 1--5. \textbf{Referencias técnicas:}
+\href{https://docs.spring.io/spring-data/jpa/reference/jpa/locking.html}{Spring Data JPA: locking};
+\href{https://docs.oracle.com/en/database/oracle/oracle-database/19/arpls/DBMS_XPLAN.html}{Oracle: planes};
+\href{https://docs.oracle.com/en/database/oracle/oracle-database/19/tgsql/optimizer-statistics-concepts.html}{estadísticas};
+\href{https://docs.oracle.com/en/database/oracle/oracle-database/19/dwhsg/refreshing-materialized-views.html}{vistas materializadas};
+\href{https://git-scm.com/docs/git-cherry-pick}{Git: cherry-pick}.}
 \end{document}

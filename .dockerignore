@@ -1,3 +1,4 @@
+# Keeps Git history, docs, generated files, and editor files out of Docker's build context.
 .git
 .github
 .idea
@@ -7,4 +8,3 @@ output
 target
 tmp
 *.log
-

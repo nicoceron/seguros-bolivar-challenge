@@ -1,3 +1,4 @@
+# Builds and tests the Java app, then runs only its JAR in a smaller Java image.
 FROM maven:3.9.11-eclipse-temurin-21-alpine AS build
 WORKDIR /workspace
 

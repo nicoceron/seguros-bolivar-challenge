@@ -1,241 +1,118 @@
-# Seguros Bolivar Policy Management Challenge
+# Gestión de pólizas — Seguros Bolívar
 
-[![CI](https://github.com/nicoceron/seguros-bolivar-challenge/actions/workflows/ci.yml/badge.svg)](https://github.com/nicoceron/seguros-bolivar-challenge/actions/workflows/ci.yml)
+API de la prueba técnica: Java 21, Spring Boot 4.1.0, JPA, Flyway y capas controller/service/repository.
 
-A production-minded Spring Boot implementation of the rental-policy technical
-assessment. It delivers every mandatory endpoint and rule, a resilient legacy-CORE
-integration boundary, automated tests, and the complete five-module written response.
+**Plain-English guide to every file:** [CODE_MAP.md](CODE_MAP.md). Java files and methods also have English purpose comments.
 
-Repository: <https://github.com/nicoceron/seguros-bolivar-challenge>
+**Entrega:** [código en GitHub](https://github.com/nicoceron/seguros-bolivar-challenge/tree/assessment/final-2026-09-16) · [informe LaTeX, dos páginas](docs/technical-assessment.tex).
 
-## What is delivered
+## Ejecutar
 
-- Java 21 and Spring Boot 4.1 API with controller, service, and repository layers.
-- `Poliza`/`Riesgo` domain model for `INDIVIDUAL` and `COLECTIVA` policies.
-- Every required endpoint, filter, state transition, and validation.
-- Mandatory `x-api-key` protection; local assessment value: `123456`.
-- Atomic policy update plus transactional outbox event for the WebLogic/CORE adapter.
-- Retry with bounded exponential backoff and a stable event ID for idempotent consumers.
-- H2 zero-setup mode, PostgreSQL production-like mode, Flyway migrations, and demo data.
-- RFC 9457-style errors, correlation IDs, OpenAPI UI, health checks, metrics, and logs.
-- Unit/integration tests, JaCoCo coverage, Docker, Compose, and GitHub Actions CI.
-- LaTeX source and final PDF answering all five modules.
-
-The authoritative requirement register is [REQUIREMENTS.md](REQUIREMENTS.md).
-
-## Architecture at a glance
-
-```mermaid
-flowchart LR
-  Client[Web / mobile clients] --> Gateway[API Gateway]
-  Gateway --> API[Policy Management API]
-  API --> Policy[Policy module]
-  API --> Risk[Risk module]
-  Policy --> DB[(PostgreSQL)]
-  Risk --> DB
-  Policy --> Outbox[(Transactional outbox)]
-  Risk --> Outbox
-  Outbox --> Adapter[CORE integration adapter]
-  Adapter --> WebLogic[WebLogic agnostic edit service]
-  WebLogic --> Core[Legacy insurance CORE]
-  Outbox --> Events[Domain event broker]
-  Events --> Notification[Notification service]
-  Notification --> Channels[Email / SMS]
-```
-
-For the assessment-sized implementation, Policy and Risk are modules inside one
-deployable unit. This preserves local transactions and low operational overhead while
-maintaining boundaries that can be extracted when independent scaling is justified.
-
-The three selected patterns are:
-
-1. **Modular monolith** - strong policy/risk boundaries without premature distributed
-   transactions; extraction seams remain explicit.
-2. **Hexagonal architecture** - the CORE dependency sits behind a port, so business rules
-   are independent of HTTP/WebLogic details and easy to test.
-3. **Event-driven integration with transactional outbox** - database mutations and CORE
-   delivery intent commit atomically; temporary CORE downtime does not lose updates.
-
-The full rationale, production topology, data model, failure modes, and scaling plan are
-in [docs/technical-assessment.tex](docs/technical-assessment.tex).
-
-## Run in under two minutes
-
-### Option A - zero setup (H2)
-
-Requirements: Java 21+ and Maven 3.9+.
+Java 21 y Maven 3.9+; la primera compilación requiere acceso a Maven Central.
 
 ```bash
+mvn verify
 mvn spring-boot:run
+# Otra terminal, opcional: Python 3.10+, biblioteca estándar
+python3 scripts/smoke.py
 ```
 
-### Option B - PostgreSQL with Docker
+H2 en memoria, puerto 8080, dos pólizas de ejemplo: 1 individual y 2 colectiva. Se reinicia al apagar la aplicación. Para otro puerto: `SERVER_PORT=8081 mvn spring-boot:run`; el mock local utiliza el mismo puerto.
+
+Perfil PostgreSQL con base persistente y configuración de ejemplo:
 
 ```bash
 docker compose up --build
 ```
 
-In both modes:
+## Contrato
 
-- API: <http://localhost:8080>
-- Swagger UI: <http://localhost:8080/swagger-ui.html>
-- OpenAPI JSON: <http://localhost:8080/v3/api-docs>
-- Health: <http://localhost:8080/actuator/health> (probe intentionally needs no key)
-- Metrics: <http://localhost:8080/actuator/metrics> (requires the API key)
+Header obligatorio en la API: `x-api-key: 123456`. Los cuerpos y DTO usan campos en inglés; las rutas y los filtros conservan el enunciado. No se requiere interfaz gráfica.
 
-Two demo policies are loaded on an empty database: one individual and one collective.
-Disable this with `DEMO_DATA_ENABLED=false`.
-
-## Mandatory API contract
-
-Every API call except the health probe requires:
-
-```http
-x-api-key: 123456
-```
-
-| Method | Path | Purpose |
+| Método | Ruta | Resultado |
 |---|---|---|
-| `GET` | `/polizas?tipo=COLECTIVA&estado=ACTIVA` | Filtered, paginated policy list |
-| `GET` | `/polizas/{id}/riesgos` | Risks for a policy |
-| `POST` | `/polizas/{id}/renovar` | Apply IPC, extend the term, mark `RENOVADA` |
-| `POST` | `/polizas/{id}/cancelar` | Cancel policy and every risk |
-| `POST` | `/polizas/{id}/riesgos` | Add risk only to `COLECTIVA` |
-| `POST` | `/riesgos/{id}/cancelar` | Cancel one risk |
-| `POST` | `/core-mock/evento` | Required CORE logging stub |
+| GET | `/polizas?tipo=COLECTIVA&estado=ACTIVA` | Lista paginada, filtros combinables |
+| GET | `/polizas/{id}/riesgos` | Riesgos, incluidos los cancelados |
+| POST | `/polizas/{id}/renovar` | Ajuste IPC y estado `RENOVADA` |
+| POST | `/polizas/{id}/cancelar` | Cancela póliza y todos sus riesgos |
+| POST | `/polizas/{id}/riesgos` | Agrega únicamente a colectiva |
+| POST | `/riesgos/{id}/cancelar` | Cancela un riesgo |
+| POST | `/core-mock/evento` | Registra intento al CORE; 202 |
 
-`POST /polizas` and `GET /polizas/{id}` are included to make the frontend journey and
-manual evaluation self-contained.
+Adicionales: `POST /polizas`, `GET /polizas/{id}`, `GET /riesgos/{id}`. Creaciones: 201 con `Location`; mutaciones: 200. Errores: 400 entrada inválida, 401 clave ausente/incorrecta, 404 inexistente, 409 regla de negocio o conflicto concurrente; cuerpo ProblemDetail con `code`.
 
-### Try the required operations
-
-List active collective policies:
+`tipo`: `INDIVIDUAL` o `COLECTIVA`; `estado`: `ACTIVA`, `RENOVADA`, `CANCELADA`. Paginación desde `page=0`, `size=20`, máximo 100, orden por ID. Respuesta: `content`, `page`, `size`, `totalElements`, `totalPages`.
 
 ```bash
-curl -sS \
-  -H 'x-api-key: 123456' \
-  'http://localhost:8080/polizas?tipo=COLECTIVA&estado=ACTIVA'
-```
+curl -H 'x-api-key: 123456' 'http://localhost:8080/polizas?tipo=COLECTIVA&estado=ACTIVA'
+curl -H 'x-api-key: 123456' http://localhost:8080/polizas/2/riesgos
 
-Renew policy 1 by 5.2% IPC:
+curl -X POST -H 'x-api-key: 123456' -H 'Content-Type: application/json' \
+  -d '{"ipcPercentage":5.2}' http://localhost:8080/polizas/1/renovar
 
-```bash
-curl -sS -X POST \
-  -H 'Content-Type: application/json' \
-  -H 'x-api-key: 123456' \
-  -d '{"ipcPercentage":5.20}' \
-  http://localhost:8080/polizas/1/renovar
-```
-
-Add a risk to collective policy 2:
-
-```bash
-curl -sS -X POST \
-  -H 'Content-Type: application/json' \
-  -H 'x-api-key: 123456' \
-  -d '{"propertyAddress":"Calle 80 # 10-20, Bogota","tenantName":"Laura Perez"}' \
+curl -X POST -H 'x-api-key: 123456' -H 'Content-Type: application/json' \
+  -d '{"propertyAddress":"Calle 80 # 10-20","tenantName":"Laura"}' \
   http://localhost:8080/polizas/2/riesgos
+
+curl -X POST -H 'x-api-key: 123456' http://localhost:8080/riesgos/2/cancelar
+curl -X POST -H 'x-api-key: 123456' http://localhost:8080/polizas/2/cancelar
+
+curl -i -X POST -H 'x-api-key: 123456' -H 'Content-Type: application/json' \
+  -d '{"evento":"ACTUALIZACION","polizaId":555}' http://localhost:8080/core-mock/evento
 ```
 
-Exercise the exact mandatory CORE mock:
+Crear una individual (el tomador debe coincidir con el arrendatario):
 
 ```bash
-curl -i -X POST \
-  -H 'Content-Type: application/json' \
-  -H 'x-api-key: 123456' \
-  -d '{"evento":"ACTUALIZACION","polizaId":555}' \
-  http://localhost:8080/core-mock/evento
-```
-
-Create an individual policy:
-
-```bash
-curl -sS -X POST \
-  -H 'Content-Type: application/json' \
-  -H 'x-api-key: 123456' \
-  -d '{
-    "type":"INDIVIDUAL",
-    "effectiveFrom":"2026-08-01",
-    "durationMonths":12,
-    "monthlyRent":1800000.00,
-    "policyholderName":"Ana Torres",
-    "beneficiaryName":"Carlos Ruiz",
-    "risks":[{
-      "propertyAddress":"Calle 72 # 10-20, Bogota",
-      "tenantName":"Ana Torres"
-    }]
-  }' \
+curl -i -X POST -H 'x-api-key: 123456' -H 'Content-Type: application/json' \
+  -d '{"type":"INDIVIDUAL","effectiveFrom":"2026-01-01","durationMonths":12,
+       "monthlyRent":100.01,"policyholderName":"Ana","beneficiaryName":"Luis",
+       "risks":[{"propertyAddress":"Calle 1","tenantName":"Ana"}]}' \
   http://localhost:8080/polizas
 ```
 
-## Business behavior and assumptions
+## Decisiones y supuestos explícitos
 
-- Currency-like values use `BigDecimal` with two decimals and `HALF_UP` rounding.
-- `premium = monthlyRent * initialDurationMonths` on creation.
-- IPC is a percentage in the inclusive range `[0, 100]`. Renewal applies the same factor
-  to rent and premium and opens a new term with the original duration.
-- Individual policy creation requires exactly one risk. The add-risk endpoint is
-  intentionally collective-only.
-- Cancellation is a state transition, not physical deletion. Policy cancellation
-  cascades to all risks in the same transaction.
-- Every create/renew/cancel/add-risk mutation creates a CORE outbox record in that same
-  transaction. Delivery is at-least-once; `eventId` gives the real CORE adapter an
-  idempotency key.
-- The literal key `123456` is retained only because the assessment mandates it. Deployed
-  environments must provide `POLICY_API_KEY` from a secrets manager.
+**Dinero y vigencia.** `BigDecimal`, dos decimales, `HALF_UP`. `canonNuevo = redondear(canon × (1 + IPC/100), 2)` y `primaNueva = canonNuevo × mesesIniciales`. Ejemplo sintético: 100.01 con 5.2% y 12 meses da 105.21 y 1262.52. El 5.2% no se presenta como IPC oficial. Se redondea el canon una vez para conservar la identidad de la prima. Fechas inclusivas; nueva vigencia desde fin anterior + 1 día, por los meses originales.
 
-## Configuration
+**Límites de la demo, no reglas adicionales del enunciado.** IPC `[0,100]`, duración `[1,1200]` meses, de 1 a 100 riesgos en la creación (individual exactamente 1; colectiva admite más mediante altas posteriores). Importes positivos, como máximo 17 enteros y 2 decimales; se rechaza el desbordamiento del canon o de la prima. Las personas se identifican por nombre, comparado tras quitar espacios externos; producción usaría identificadores de terceros. El beneficiario por riesgo colectivo pertenece al modelo objetivo, no al DTO simplificado.
 
-| Variable | Default | Meaning |
-|---|---|---|
-| `POLICY_API_KEY` | `123456` | Required request key |
-| `SERVER_PORT` | `8080` | HTTP port |
-| `CORE_BASE_URL` | `http://localhost:8080` | CORE/WebLogic adapter base URL |
-| `CORE_DISPATCH_ENABLED` | `true` | Enables outbox delivery worker |
-| `DEMO_DATA_ENABLED` | `true` | Loads two policies when the database is empty |
-| `DATABASE_URL` | PostgreSQL local URL | JDBC URL in the `postgres` profile |
-| `DATABASE_USERNAME` | `policies` | PostgreSQL user |
-| `DATABASE_PASSWORD` | `policies` | PostgreSQL password |
+**Consistencia.** Las mutaciones toman un bloqueo de escritura sobre la póliza antes de modificar sus riesgos; cancelación y alta no pueden cruzarse dejando un riesgo activo. Datos y evento outbox comparten transacción. Las cancelaciones repetidas no producen nuevos cambios ni eventos. Renovar dos veces abre dos vigencias: el endpoint de renovación no deduplica peticiones y no debe reintentarse automáticamente tras una respuesta ambigua.
 
-## Quality gates
+**Integración.** Tras confirmar la transacción, el worker consulta pendientes cada segundo y realiza un POST HTTP al mock. Timeouts: conexión 2 s, lectura 3 s; máximo cinco intentos con espera exponencial. UUID estable en `eventId` e `Idempotency-Key`. Cada evento se bloquea antes de procesar y se respeta la próxima fecha de intento. Se conservan registros `FAILED` para investigación/reproceso controlado. El contrato mínimo del mock acepta también el JSON exacto del enunciado sin UUID.
 
-```bash
-mvn verify
-```
+**Límite distribuido.** Respuesta exitosa = cambio local + envío pendiente, no confirmación del CORE. Un fallo después del HTTP y antes del commit puede repetir una entrega; el receptor real debe deduplicar. El mock solo escribe logs, no deduplica ni demuestra actualización de un CORE. Integrar WebLogic real exige adaptar contrato, autenticación, orden por póliza y conciliación. Broker, correo/SMS, Gateway, alta disponibilidad y renovación automática se describen en el módulo 1; no están implementados en este ejercicio esencial.
 
-This compiles the Java 21 target, applies Flyway against H2, executes domain and
-full-context MockMvc tests, and produces the JaCoCo report at
-`target/site/jacoco/index.html`.
+**Seguridad.** `123456` es exclusivamente la clave exigida para la prueba. En despliegue, cambiar `POLICY_API_KEY`, usar TLS y gestión de secretos. La API key no sustituye autorización por usuario/tenant. Las sondas de salud, el despacho interno de errores y la documentación Swagger se exceptúan del filtro para que Swagger abra en el navegador; las operaciones de pólizas, riesgos, mock CORE y las métricas siguen exigiendo la clave. En Swagger, pulsa **Authorize**, introduce `123456` y después **Try it out**.
 
-CI repeats the same command on every main/topic-branch push and pull request. The tests
-cover all mandatory rules plus API-key rejection, filter semantics, CORE delivery intent,
-and retry scheduling.
+## Configuración y observabilidad
 
-## Project structure
+| Variable | Valor predeterminado |
+|---|---|
+| `POLICY_API_KEY` | `123456` |
+| `SERVER_PORT` | `8080` |
+| `CORE_BASE_URL` | `http://localhost:<SERVER_PORT>` |
+| `CORE_DISPATCH_ENABLED` | `true` |
+| `DEMO_DATA_ENABLED` | `true` |
+| `DATABASE_URL` | JDBC PostgreSQL local, perfil `postgres` |
+| `DATABASE_USERNAME` / `DATABASE_PASSWORD` | `policies` / `policies`, solo ejemplo |
+
+Salud: `/actuator/health`. Métricas protegidas: `/actuator/metrics`, `/actuator/prometheus`; contador `policy.core.events`. `X-Correlation-ID` se devuelve y aparece en logs; valores inseguros se reemplazan. OpenAPI: `/v3/api-docs`; Swagger: `/swagger-ui.html`.
+
+## Pruebas y estructura
+
+**55 pruebas aprobadas** con `mvn verify`: dominio, seguridad, validación HTTP, filtros, reglas, rollback de datos/outbox, concurrencia real de dos transacciones, HTTP del adapter y reintentos. [Evidencia y alcance](docs/verification.md). `scripts/smoke.py` crea sus propios datos y verifica 18 llamadas HTTP; puede repetirse sin depender de IDs iniciales. JaCoCo: `target/site/jacoco/index.html`. No se afirma validación de carga ni ejecución de PostgreSQL/Docker.
 
 ```text
-src/main/java/com/segurosbolivar/policy
-├── api/             REST controllers, DTOs, and problem responses
-├── config/          API key, correlation, OpenAPI, and demo setup
-├── domain/          Poliza/Riesgo entities and lifecycle invariants
-├── integration/     CORE port, HTTP adapter, and outbox dispatcher
-├── repository/      Spring Data repositories
-└── service/         Transactional application use cases
+src/main/java/com/segurosbolivar/policy/
+  api/           Controllers, DTO y errores
+  domain/        Policy (Poliza), Risk (Riesgo), reglas y dinero
+  service/       Casos de uso y transacciones
+  repository/    Persistencia y bloqueos
+  integration/   Puerto CORE, adapter HTTP y outbox
+  config/        Clave, correlación, OpenAPI y datos demo
+src/main/resources/db/migration/   Esquema Flyway
+src/test/                         Pruebas JUnit
 ```
 
-## Submission artifacts
-
-Build the LaTeX report:
-
-```bash
-make docs
-```
-
-Build the PDF and clean source ZIP with the required names:
-
-```bash
-make package
-```
-
-Artifacts are written to `output/` and are intentionally not committed.
-
+Informe y paquete: `make docs` y `make package` (este último exige cambios confirmados en Git). Requiere TeX Live con español, fuentes recomendadas y latex-extra, o Tectonic; Python 3 para empaquetar. Salidas: `output/pdf/Nicolas_Ceron_Prueba_Tecnica.pdf` y `output/Nicolas_Ceron_Prueba_Tecnica.zip`. El código se entrega mediante el enlace de GitHub; el ZIP es una copia adicional.

@@ -1,3 +1,4 @@
+# PostgreSQL settings selected by the "postgres" profile used in Docker Compose.
 spring:
   datasource:
     url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/policies}

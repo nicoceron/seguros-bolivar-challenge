@@ -1,3 +1,4 @@
+# Keeps generated builds, local secrets, and editor files out of Git.
 # Build outputs
 target/
 build/
@@ -19,4 +20,3 @@ out/
 tmp/
 output/
 docs/build/
-

@@ -1,3 +1,4 @@
+# Checks Maven and GitHub Actions dependencies for available updates each week.
 version: 2
 updates:
   - package-ecosystem: maven
@@ -10,4 +11,3 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 3
-

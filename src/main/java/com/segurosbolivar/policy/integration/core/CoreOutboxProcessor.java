@@ -1,3 +1,4 @@
+// Purpose of this file: Attempts delivery and marks an event sent or schedules a retry.
 package com.segurosbolivar.policy.integration.core;
 
 import com.segurosbolivar.policy.integration.outbox.CoreOutboxEvent;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
+import java.time.Instant;
 
 @Service
 public class CoreOutboxProcessor {
@@ -23,6 +25,7 @@ public class CoreOutboxProcessor {
     private final Counter sentCounter;
     private final Counter failedCounter;
 
+    /** Receives dependencies and sets up success and failure counters. */
     public CoreOutboxProcessor(
             CoreOutboxEventRepository repository,
             CoreEventPublisher publisher,
@@ -37,9 +40,13 @@ public class CoreOutboxProcessor {
     }
 
     @Transactional
+    /** Locks one due event, sends it, and saves SENT or the next retry. */
     public void process(UUID eventId) {
-        CoreOutboxEvent event = repository.findById(eventId).orElse(null);
+        CoreOutboxEvent event = repository.findByIdForUpdate(eventId).orElse(null);
         if (event == null || event.getStatus() != com.segurosbolivar.policy.integration.outbox.OutboxStatus.PENDING) {
+            return;
+        }
+        if (event.getNextAttemptAt().isAfter(Instant.now())) {
             return;
         }
         try {

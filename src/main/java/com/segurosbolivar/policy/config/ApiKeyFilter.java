@@ -1,3 +1,4 @@
+// Purpose of this file: Checks x-api-key before protected HTTP requests reach a controller.
 package com.segurosbolivar.policy.config;
 
 import jakarta.servlet.FilterChain;
@@ -28,6 +29,7 @@ public class ApiKeyFilter extends OncePerRequestFilter {
     private final byte[] expectedApiKey;
     private final ObjectMapper objectMapper;
 
+    /** Stores the expected key and JSON writer for unauthorized responses. */
     public ApiKeyFilter(
             @Value("${app.security.api-key}") String expectedApiKey,
             ObjectMapper objectMapper
@@ -37,6 +39,7 @@ public class ApiKeyFilter extends OncePerRequestFilter {
     }
 
     @Override
+    /** Compares the supplied key and stops the request with 401 if it is wrong or missing. */
     protected void doFilterInternal(
             HttpServletRequest request,
             HttpServletResponse response,
@@ -66,10 +69,15 @@ public class ApiKeyFilter extends OncePerRequestFilter {
     }
 
     @Override
+    /** Lets the browser load Swagger and Docker check health; API operations still require the key. */
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
         return path.equals("/error")
                 || path.equals("/actuator/health")
-                || path.startsWith("/actuator/health/");
+                || path.startsWith("/actuator/health/")
+                || path.equals("/swagger-ui.html")
+                || path.startsWith("/swagger-ui/")
+                || path.equals("/v3/api-docs")
+                || path.startsWith("/v3/api-docs/");
     }
 }
